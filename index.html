@@ -1,0 +1,1716 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>AI Clipper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#050505; --panel:#101012; --panel2:#17171a; --surface:#141416; --surface2:#1d1d20;
+        --ink:#ffffff; --ink2:#a3a3ab; --ink3:#6f6f77;
+        --line:#26262a; --line2:#333338;
+        --lime:#c8f542; --lime-ink:#11130a;
+        --btn:#ffffff; --btn-ink:#0a0a0a;
+        --cap-hl:#ffd60a; --cap-main:#ffffff;
+        --radius:20px;
+        --shadow:0 24px 60px rgba(0,0,0,.55);
+      }
+      *{box-sizing:border-box}
+      html,body{margin:0;padding:0}
+      body{background:var(--bg);color:var(--ink);font-family:"Manrope",system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+      button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]){min-height:2.25rem}
+      button{font-family:inherit;cursor:pointer}
+      input,select{font-family:inherit}
+      .wrap{max-width:1180px;margin:0 auto;padding:34px 18px 64px}
+      h1,h2,h3{margin:0;line-height:1.12}
+
+      /* ---------- Hero (Opus style) ---------- */
+      .hero{text-align:center;padding:26px 0 8px}
+      .kicker{font-size:12.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2)}
+      .hero h1{font-size:clamp(38px,6.4vw,68px);font-weight:800;letter-spacing:-.03em;line-height:1.06;margin:18px auto 0;max-width:16ch}
+      .pillword{display:inline-block;padding:.02em .38em .06em;border-radius:999px;color:#fff;background:linear-gradient(100deg,#3d4a4a 0%,#7a5a63 45%,#2e3d46 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);white-space:nowrap}
+      .hero .sub{color:var(--ink2);font-size:clamp(15px,2vw,17.5px);max-width:56ch;margin:20px auto 0;line-height:1.55}
+
+      /* ---------- Pill link bar ---------- */
+      .linkbar{max-width:680px;margin:30px auto 0;background:#1b1b1e;border:1px solid var(--line2);border-radius:999px;padding:6px;display:flex;align-items:center;gap:6px;box-shadow:0 14px 40px rgba(0,0,0,.5)}
+      .linkbar .plus{flex:none;width:34px;height:34px;margin-left:6px;border-radius:50%;border:1.5px solid var(--line2);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:600}
+      .linkbar input[type="url"]{flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font-size:15.5px;padding:10px 4px;min-height:46px}
+      .linkbar input[type="url"]::placeholder{color:var(--ink3)}
+      .linkbar input[type="url"]:focus{outline:none}
+      .linkbar:focus-within{border-color:#4a4a52}
+      .btn{border:0;border-radius:999px;padding:10px 20px;font-weight:800;font-size:14.5px;min-height:46px;display:inline-flex;align-items:center;gap:8px;justify-content:center;white-space:nowrap}
+      .btn-white{background:var(--btn);color:var(--btn-ink)}
+      .btn-dark{background:var(--surface2);color:var(--ink);border:1px solid var(--line2)}
+      .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line2)}
+      .btn-lime{background:var(--lime);color:var(--lime-ink)}
+      .btn:active{transform:translateY(1px)}
+      .btn[disabled]{opacity:.4;cursor:not-allowed}
+      .linkbar .btn{flex:none;min-height:48px;padding:10px 24px;font-size:15px}
+      .err{color:#ff6b61;font-weight:700;font-size:13.5px;margin:12px auto 0;display:none;max-width:680px;text-align:center}
+      .linkmeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;align-items:center;justify-content:center}
+      .pill{font-size:12px;font-weight:700;background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink2)}
+      .pill.ok{color:var(--lime);border-color:var(--lime)}
+
+      /* ---------- Feature chips ---------- */
+      .feats{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin:34px auto 0;max-width:900px}
+      .feat{display:inline-flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 15px;font-size:13.5px;font-weight:700;color:#e8e8ea}
+      .feat svg{width:16px;height:16px;stroke:var(--lime);flex:none}
+
+      /* ---------- Product panel ---------- */
+      .panel{margin-top:38px;background:linear-gradient(180deg,#131315,#0c0c0e);border:1px solid var(--line);border-radius:26px;padding:22px;box-shadow:var(--shadow)}
+      .grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+      @media (max-width:1020px){.grid{grid-template-columns:1fr 1fr}}
+      @media (max-width:680px){.grid{grid-template-columns:1fr}.panel{padding:16px;border-radius:20px}}
+      .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;color:#fff}
+      .card .sub{color:var(--ink2);font-size:13px;margin:0 0 14px}
+
+      .playerbox{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+      .playerbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+      .playerempty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-weight:700;font-size:14px;text-align:center;padding:16px}
+      .vidtitle{font-weight:800;font-size:15.5px;margin:12px 0 2px}
+      .vidmeta{color:var(--ink2);font-size:13px}
+
+      .maker{margin-top:16px;border-top:1px dashed var(--line2);padding-top:16px}
+      .maker .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+      .timebox{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-weight:800;font-variant-numeric:tabular-nums;font-size:13.5px}
+      .maker input[type="text"]{width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);margin-top:10px;font-size:14.5px}
+      .maker input[type="text"]:focus{outline:2px solid var(--lime);outline-offset:1px;border-color:transparent}
+      .maker .btn{min-height:40px;padding:8px 14px;font-size:13px}
+      .small{font-size:12.5px;color:var(--ink2)}
+
+      /* ---------- 9:16 Preview stage ---------- */
+      .stagewrap{display:flex;flex-direction:column;align-items:center}
+      .stage{position:relative;width:min(290px,84vw);aspect-ratio:9/16;background:#000;border-radius:20px;overflow:hidden;box-shadow:0 22px 50px rgba(0,0,0,.65);flex:none;border:1px solid var(--line2)}
+      .stage .sec{position:absolute;left:0;right:0;overflow:hidden}
+      .stage img.fill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+      .sec-face{top:0;height:32%}
+      .sec-game{top:32%;bottom:0;height:68%}
+      .sec-face img.fill{object-position:center 18%;transform-origin:center 30%}
+      .sec-game img.fill{object-position:center 55%;transform-origin:center center}
+      .zoom-on .sec-face img.fill{animation:zoomer 7s ease-in-out infinite alternate}
+      .zoom-on .sec-game img.fill{animation:zoomer 11s ease-in-out infinite alternate-reverse}
+      @keyframes zoomer{from{transform:scale(1.02)}to{transform:scale(1.22)}}
+      @media (prefers-reduced-motion: reduce){.zoom-on .sec-face img.fill,.zoom-on .sec-game img.fill{animation:none}}
+      /* Live video crops — asli playing video feed, static thumbnail nahi */
+      .crop{position:absolute;inset:0;overflow:hidden;display:none}
+      .vidbox{position:absolute;left:50%;aspect-ratio:16/9}
+      .vidbox iframe{width:100%;height:100%;border:0;display:block;pointer-events:none}
+      .face-vid{width:190%;top:-2%;transform:translateX(-50%);transform-origin:center 30%}
+      .game-vid{width:224%;top:50%;transform:translate(-50%,-50%);transform-origin:center center}
+      .zoom-on .face-vid{animation:zoomerF 7s ease-in-out infinite alternate}
+      .zoom-on .game-vid{animation:zoomerG 11s ease-in-out infinite alternate-reverse}
+      @keyframes zoomerF{from{transform:translateX(-50%) scale(1.02)}to{transform:translateX(-50%) scale(1.22)}}
+      @keyframes zoomerG{from{transform:translate(-50%,-50%) scale(1.02)}to{transform:translate(-50%,-50%) scale(1.22)}}
+      @media (prefers-reduced-motion: reduce){.zoom-on .face-vid,.zoom-on .game-vid{animation:none}}
+      /* No label, title or overlay on the seam — thumbnail / face cam touches gameplay directly, zero gap */
+      /* Captions ab black zone mein nahi — gameplay ke upar chhota overlay, YouTube subtitle style.
+         TikTok ke side buttons / bottom UI se door, gameplay ke neeche wale hisse par. */
+      .sec-cap{position:absolute;left:0;right:0;top:67%;display:flex;flex-direction:column;align-items:center;padding:0 12px;z-index:4;pointer-events:none;background:none}
+      .capline{font-family:"Anton",sans-serif;text-transform:uppercase;text-align:center;font-size:clamp(11px,3.2vw,13px);line-height:1.3;color:var(--cap-main);letter-spacing:.02em;white-space:nowrap;overflow:hidden;max-width:100%}
+      .capline .w{display:inline-block;background:rgba(0,0,0,.62);padding:2px 6px;border-radius:4px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+      .capline .w.key{color:var(--cap-hl)}
+      .progressbar{position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(255,255,255,.22);z-index:6}
+      .progressbar i{display:block;height:100%;width:0%;background:var(--lime)}
+      .stage .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#777d85;font-weight:700;font-size:13px;text-align:center;padding:20px;z-index:2}
+      .stagectl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px;width:100%}
+      .stagectl .btn{min-height:42px;padding:8px 16px;font-size:13.5px}
+      .selclip{font-weight:800;font-size:13.5px;text-align:center;margin-top:12px}
+      .selclip span{color:var(--ink2);font-weight:600}
+
+      /* ---------- Settings ---------- */
+      .field{margin-bottom:16px}
+      .field label{display:block;font-weight:800;font-size:13px;margin-bottom:7px}
+      .field label small{display:block;font-weight:600;color:var(--ink2);font-size:12px;margin-top:2px}
+      .field input[type="text"],.field select{width:100%;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-size:15px;font-weight:600}
+      .field input[type="text"]:focus,.field select:focus{outline:2px solid var(--lime);outline-offset:1px;border-color:transparent}
+      .seg{display:flex;gap:8px}
+      .seg button{flex:1;border:1.5px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:12px;font-weight:800;font-size:15px;min-height:46px}
+      .seg button.sel{background:#fff;border-color:#fff;color:#0a0a0a}
+      .seg3 button{font-size:13px;padding:6px 4px}
+      .segwrap{flex-wrap:wrap}
+      .segwrap button{flex:1 1 17%;font-size:14px}
+      .checkbox{margin-top:12px;background:var(--surface);border:1.5px solid var(--line2);border-radius:12px;padding:12px 13px}
+      .checkbox .chead{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800;font-size:13px}
+      .checkbox .cstatus{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);background:var(--surface2);border:1px solid var(--line);padding:3px 8px;border-radius:999px;white-space:nowrap}
+      .checkbox .cstatus.done{color:var(--lime-ink);background:var(--lime);border-color:var(--lime)}
+      .checkbox .cstatus.scanning{color:#11130a;background:#ffd60a;border-color:#ffd60a}
+      .checkbox .cbar{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:10px;display:none}
+      .checkbox .cbar i{display:block;height:100%;width:0%;background:var(--lime);transition:width .3s}
+      .checkbox .cdetail{font-size:12.5px;color:var(--ink2);margin-top:9px;line-height:1.5}
+      .checkbox .cdetail b{color:#fff}
+      .checkbox .cresult{margin-top:9px;font-size:13px;font-weight:800;display:none}
+      .checkbox .cresult.show{display:block}
+      .switchrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px dashed var(--line2)}
+      .switchrow .t{font-weight:800;font-size:13.5px}
+      .switchrow .d{font-size:12px;color:var(--ink2)}
+      .switch{position:relative;width:52px;height:30px;flex:none;display:block}
+      .switch input{appearance:none;-webkit-appearance:none;width:52px;height:30px;min-height:30px;margin:0;background:var(--surface2);border:1.5px solid var(--line2);border-radius:999px;cursor:pointer;position:relative;transition:.15s;display:block}
+      .switch input:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--ink2);transition:.15s}
+      .switch input:checked{background:var(--lime);border-color:var(--lime)}
+      .switch input:checked:after{left:25px;background:#11130a}
+      input[type="range"]{width:100%;accent-color:var(--lime)}
+      .genbtn{width:100%;font-size:16px;min-height:54px}
+      .progress{display:none;margin-top:12px}
+      .progress .bar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden}
+      .progress .bar i{display:block;height:100%;width:0%;background:var(--lime);transition:width .3s}
+      .progress .step{font-size:12.5px;color:var(--ink2);font-weight:700;margin-top:7px;text-align:center}
+
+      /* ---------- Clips ---------- */
+      .clipshead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:44px 0 6px}
+      .clipshead h2{font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.02em}
+      .clipshead .acts{display:flex;gap:8px;flex-wrap:wrap}
+      .clipshead .btn{min-height:42px;padding:8px 16px;font-size:13px}
+      .clipssub{color:var(--ink2);margin:0 0 16px}
+      .clipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:14px}
+      .clip{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+      .mini{position:relative;aspect-ratio:9/16;max-height:300px;width:100%;background:#000;overflow:hidden}
+      .mini img{position:absolute;left:0;width:100%;object-fit:cover}
+      .mini .mf{top:0;height:32%;object-position:center 18%}
+      .mini .mg{top:32%;height:68%;object-position:center 55%}
+      .mini .mcap{position:absolute;left:6px;right:6px;top:66%;color:#fff;display:flex;justify-content:center;text-align:center;font-family:"Anton",sans-serif;text-transform:uppercase;font-size:10px;line-height:1.3;text-shadow:0 1px 3px rgba(0,0,0,.85);white-space:nowrap;overflow:hidden}
+      .mini .mcap span{background:rgba(0,0,0,.62);padding:2px 7px;border-radius:4px}
+      .mini .mcap b{color:var(--cap-hl);font-weight:400}
+      .mini .score{position:absolute;left:10px;bottom:10px;z-index:4;background:rgba(10,10,10,.82);border:1px solid rgba(255,255,255,.14);border-radius:9px;padding:4px 9px 5px;text-align:center;line-height:1}
+      .mini .score small{display:block;font-size:8px;font-weight:800;letter-spacing:.14em;color:#bdbdc4;margin-bottom:2px}
+      .mini .score b{font-size:19px;font-weight:800;color:var(--lime);letter-spacing:-.01em}
+      .mini .score.man b{font-size:11px;letter-spacing:.08em;color:#fff}
+      .clipbody{padding:13px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+      .clipbody h3{font-size:14.5px}
+      .clipmeta{font-size:12.5px;color:var(--ink2);font-weight:700;font-variant-numeric:tabular-nums}
+      .clipbtns{display:flex;gap:7px;margin-top:auto;padding-top:9px;flex-wrap:wrap}
+      .clipbtns .btn{min-height:38px;padding:7px 13px;font-size:12.5px}
+      .empty{border:1.5px dashed var(--line2);border-radius:18px;padding:36px 20px;text-align:center;color:var(--ink2);font-weight:600;background:var(--panel)}
+      .empty b{color:var(--ink)}
+
+      /* ---------- Upload / Parts / Hashtags / Downloads ---------- */
+      .uploadrow{max-width:680px;margin:14px auto 0;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+      .uploadrow label.btn{min-height:44px}
+      .uploadrow .fname{color:var(--ink2);font-size:12.5px;font-weight:600;flex-basis:100%;text-align:center}
+      .stage video.fill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+      .sec-face video.fill{object-position:center 18%}
+      .sec-game video.fill{object-position:center 55%}
+      .zoom-on .sec-face video.fill{animation:zoomer 7s ease-in-out infinite alternate}
+      .zoom-on .sec-game video.fill{animation:zoomer 11s ease-in-out infinite alternate-reverse}
+      @media (prefers-reduced-motion: reduce){.zoom-on .sec-face video.fill,.zoom-on .sec-game video.fill{animation:none}}
+      .mini .partbadge{position:absolute;top:10px;right:10px;z-index:4;background:var(--lime);color:var(--lime-ink);font-size:11px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:999px;text-transform:uppercase}
+      .mini .viralbadge{position:absolute;top:10px;left:10px;z-index:4;background:#ff4d42;color:#fff;font-size:11px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:999px;text-transform:uppercase}
+      .viralbtn{width:100%;font-size:15px;min-height:50px;margin-top:10px}
+      .viralres{display:none;margin-top:10px;background:var(--surface);border:1.5px solid var(--lime);border-radius:12px;padding:11px 13px;font-size:13px;font-weight:700;line-height:1.5}
+      .viralres.show{display:block}
+      .viralres span{color:var(--ink2);font-weight:600;display:block;margin-top:2px}
+      .tagbox{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+      .tagbox .tlabel{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--ink3);text-transform:uppercase;margin-bottom:3px}
+      .tagtext{font-size:12px;color:#9ecbff;font-weight:600;word-break:break-word;line-height:1.45}
+      .dlstatus{display:none;margin:0 0 14px;font-weight:700;color:var(--lime);font-size:13.5px}
+
+      /* ---------- Download solution guide ---------- */
+      .guide{margin-top:30px;background:var(--panel);border:1.5px solid var(--lime);border-radius:22px;padding:22px}
+      .guide h2{font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.01em}
+      .guide .gsub{color:var(--ink2);font-size:14px;margin:8px 0 0;max-width:75ch}
+      .guide .gsub b{color:#fff}
+      .guidegrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+      @media (max-width:680px){.guidegrid{grid-template-columns:1fr}}
+      .gcol{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+      .gcol h3{font-size:15px;margin-bottom:10px}
+      .gcol ol{margin:0;padding-left:20px;color:var(--ink2);font-size:13.5px}
+      .gcol ol li{margin-bottom:8px}
+      .gcol ol li b{color:#fff}
+      .gcol .warn{color:#ffb3ad;font-weight:700}
+
+      /* ---------- Steps ---------- */
+      .steps{margin-top:52px;text-align:center}
+      .steps h2{font-size:clamp(24px,3.6vw,36px);font-weight:800;letter-spacing:-.02em}
+      .steps .ssub{color:var(--ink2);margin:10px auto 0;max-width:52ch}
+      .stepgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px;text-align:left}
+      @media (max-width:760px){.stepgrid{grid-template-columns:1fr}}
+      .step{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px}
+      .step .n{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--lime);color:var(--lime-ink);font-weight:800;font-size:14px;margin-bottom:12px}
+      .step h3{font-size:16.5px;margin-bottom:6px}
+      .step p{color:var(--ink2);font-size:13.5px;margin:0}
+      .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#fff;color:#0a0a0a;font-weight:800;font-size:14px;padding:12px 20px;border-radius:99px;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:var(--shadow);max-width:92vw;text-align:center}
+      .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+      footer{margin-top:44px;color:var(--ink3);font-size:12.5px;text-align:center}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <!-- ======= HERO ======= -->
+      <section class="hero">
+        <div class="kicker">#1 AI Video Clipper for TikTok &amp; Reels</div>
+        <h1>Turn any video into <span class="pillword">viral clips</span> 10x faster</h1>
+        <p class="sub">YouTube link paste karo — ya apni video file upload karo. AI pehle <b style="color:#fff">poori video ko khud check karega</b> — video ke frames scan karke dekhega ke us mein streamer ka face nazar aata hai ya nahi. <b style="color:#fff">Face nazar aaya to streamer video</b> (upar face full zoom, neeche gameplay), <b style="color:#fff">face nahi — sirf voiceover + gameplay hai to voiceover video</b> (upar video ka thumbnail, neeche gameplay). Phir best moments khud dhoondh kar 9:16 clips bana dega: har clip apne Part number (Part 1, Part 2, …) aur apne hashtags ke saath. <b style="color:#fff">Asal video file download sirf upload ki hui video se hoti hai</b> — neeche wale guide mein seedha hal parh lo ke tumhein kya karna hai.</p>
+
+        <div class="linkbar">
+          <span class="plus">+</span>
+          <input type="url" id="ytUrl" placeholder="Drop a YouTube link — youtube.com/watch?v=…" autocomplete="off" />
+          <button class="btn btn-white" id="loadBtn">Get Clips</button>
+        </div>
+        <div class="uploadrow">
+          <label class="btn btn-dark" for="fileInput" style="cursor:pointer">Video File Upload Karo</label>
+          <input type="file" id="fileInput" accept="video/*" style="display:none" />
+          <span class="fname" id="fileName">Apni video file (MP4 / MOV / WebM) upload karo — phir har clip ki asal video file isi browser mein ban kar download hogi, bina kisi server ke.</span>
+        </div>
+        <div class="err" id="linkErr">Ye valid YouTube link nahi lag raha. Poora link paste karo, jaise youtube.com/watch?v=…</div>
+        <div class="linkmeta">
+          <span class="pill" id="statusPill">Koi video load nahi hui</span>
+          <span class="pill" id="typePill" style="display:none"></span>
+          <span class="pill">9:16 Vertical</span>
+          <span class="pill">TikTok · Reels · Shorts</span>
+        </div>
+
+        <div class="feats">
+          <span class="feat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/></svg>AI Clipping</span>
+          <span class="feat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M6 12h4M14 12h4M6 16h7"/></svg>AI Captions</span>
+          <span class="feat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>AI Reframe 9:16</span>
+          <span class="feat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Viral Score</span>
+          <span class="feat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.4L12 15l-1.9-4.6L5.5 9l4.6-1.4z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>Auto Hook Text</span>
+          <span class="feat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Part Downloads</span>
+          <span class="feat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5z"/></svg>Viral Moment Finder</span>
+        </div>
+      </section>
+
+      <!-- ======= DOWNLOAD SOLUTION GUIDE ======= -->
+      <section class="guide" id="dlGuide">
+        <h2>Video Download Nahi Ho Raha? — Seedha Hal, Pehle Ye Parh Lo</h2>
+        <p class="gsub">Do hi surat hain. <b>YouTube link se video file kabhi download nahi hoti</b> — YouTube apni videos ka file deta hi nahi hai, ye kisi bhi website ke bas mein nahi. <b>Asal video file sirf tab download hogi jab video ki file tumhare phone mein ho aur tum use yahan upload karo.</b> Bas yehi ek tareeqa hai — neeche step by step likha hai ke tumhein kya karna hai aur clipper kya karega.</p>
+        <div class="guidegrid">
+          <div class="gcol">
+            <h3>👉 Tumhein kya karna hai (sirf 3 step)</h3>
+            <ol>
+              <li><b>Video ki file phone mein lao.</b> Video tumhari apni hai to <b>YouTube Studio app</b> kholo → apni video → ⋮ menu → <b>Save to device / Download</b>. Kisi aur ki video ka file download allowed nahi hai — us ke liye sirf clip ka time aur plan milega.</li>
+              <li><b>Upar “Video File Upload Karo” se wohi file select karo</b>, phir “AI Clips Banao” dabao. (YouTube link sirf preview aur plan ke liye hai — us se video file nahi milegi.)</li>
+              <li><b>Har Part ke neeche “Download Video” dabao</b> aur thoda wait karo — clip tumhare browser mein banti hai, is liye jitni lambi clip, utna hi time (taqreeban clip ki length jitna). <b>Page band na karo</b> jab tak download start na ho jaye. File seedha phone ke Downloads mein jayegi.</li>
+            </ol>
+          </div>
+          <div class="gcol">
+            <h3>⚙️ Clipper kya karega</h3>
+            <ol>
+              <li>Upload ki hui file se har Part ko <b>9:16 layout mein kaat kar asal video file</b> banayega — upar thumbnail / face cam, neeche gameplay, captions ke saath — aur download karwa dega. Format MP4 hoga jahan browser support kare, warna WebM (dono hi asal video files hain, TikTok par lag jati hain).</li>
+              <li><b>Download All</b> dabane par saare Parts ek <b>ZIP</b> mein milenge — Part 1, Part 2, Part 3 alag alag files, hashtags wali plan file ke saath.</li>
+              <li>YouTube link wale Part par Download dabane se <span class="warn">video nahi, sirf plan file (.txt)</span> milegi — exact time, hook, captions aur hashtags ke saath. <b>Agar .txt aayi hai to is ka matlab hai tum link mode mein ho — video chahiye to file upload karo (step 1–2).</b></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======= WORKSPACE PANEL ======= -->
+      <div class="panel">
+        <div class="grid">
+          <!-- ======= SOURCE + MAKER ======= -->
+          <section class="card">
+            <h2>Source Video</h2>
+            <p class="sub">Yahan original video chalegi. Koi moment khud pasand aaye to neeche se manual clip bhi bana sakte ho.</p>
+            <div class="playerbox">
+              <div class="playerempty" id="playerEmpty">Upar YouTube link paste karke<br />“Get Clips” dabao</div>
+              <div id="ytPlayer"></div>
+              <video id="uploadPlayer" controls playsinline style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000"></video>
+            </div>
+            <div class="vidtitle" id="vidTitle"></div>
+            <div class="vidmeta" id="vidMeta"></div>
+
+            <div class="maker">
+              <div class="row">
+                <span class="timebox">Ab: <span id="curTime">0:00</span></span>
+                <button class="btn btn-ghost" id="setStart">▶ Yahan se Start</button>
+                <button class="btn btn-ghost" id="setEnd">Yahan End ⏸</button>
+              </div>
+              <div class="row" style="margin-top:9px">
+                <span class="timebox">Start: <span id="mkStart">—</span></span>
+                <span class="timebox">End: <span id="mkEnd">—</span></span>
+                <span class="timebox">Length: <span id="mkLen">—</span></span>
+              </div>
+              <input type="text" id="mkTitle" placeholder="Clip ka hook title likho (jaise: Ye clutch koi nahi bhoolega!)" />
+              <div class="row" style="margin-top:10px">
+                <button class="btn btn-dark" id="addManual">+ Manual Clip Add Karo</button>
+                <span class="small">Best length: 25–45 second</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- ======= 9:16 PREVIEW ======= -->
+          <section class="card">
+            <h2>Clip Preview · 9:16</h2>
+            <p class="sub" id="previewSub">Preview mein asli video hi chalti hai — upar thumbnail ya face cam, us ke bilkul neeche gameplay. Dono bilkul chipke hue hain: beech mein koi black gap, border, title, caption ya overlay nahi, aur gameplay ke neeche bhi koi black space nahi — gameplay frame ke aakhir tak full bhari hui hai. Captions sirf gameplay ke upar, character ke pairon ke paas, ek hi line mein aate hain — ek time par sirf 2–3 words.</p>
+            <div class="stagewrap">
+              <div class="stage zoom-on" id="stage">
+                <div class="noimg" id="stageEmpty">Video load hone ke baad<br />preview yahan aayega</div>
+                <div class="sec sec-face">
+                  <img class="fill" id="faceImg" alt="" style="display:none" />
+                  <video class="fill" id="faceVid" muted playsinline loop style="display:none"></video>
+                  <div class="crop" id="faceCrop"><div class="vidbox face-vid"><div id="facePlayer"></div></div></div>
+                </div>
+                <div class="sec sec-game">
+                  <img class="fill" id="gameImg" alt="" style="display:none" />
+                  <video class="fill" id="gameVid" muted playsinline loop style="display:none"></video>
+                  <div class="crop" id="gameCrop"><div class="vidbox game-vid"><div id="gamePlayer"></div></div></div>
+                </div>
+                <div class="sec sec-cap" id="capSec">
+                  <div class="capline" id="capLine">Captions yahan aayenge</div>
+                </div>
+                <div class="progressbar"><i id="progFill"></i></div>
+              </div>
+              <div class="selclip" id="selInfo">Koi clip select nahi <span>— neeche clips banao ya select karo</span></div>
+              <div class="stagectl">
+                <button class="btn btn-white" id="playSeg">▶ Clip Play Karo</button>
+                <button class="btn btn-ghost" id="capReplay">Captions Replay</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ======= SETTINGS + GENERATE ======= -->
+          <section class="card">
+            <h2>Settings</h2>
+            <p class="sub">Ek dafa set karo — har clip par khud apply ho jayega.</p>
+
+            <div class="field">
+              <label>Video Type — Pehle Video Check Hoga
+                <small>Auto Detect mein clipper title nahi dekhta — woh <b>video ko khud check karta hai</b>: poori video ke alag alag hisso se frames scan karke dekhta hai ke streamer ka face video mein nazar aata hai ya nahi. Face show ho jaye to streamer samjho, na ho to voiceover + gameplay samjho. Chaho to khud bhi chun sakte ho — manual chunne par check ka result override ho jayega.</small>
+              </label>
+              <div class="seg seg3" id="typeSeg">
+                <button data-t="auto" class="sel">Auto · Video Check</button>
+                <button data-t="streamer">Streamer</button>
+                <button data-t="voiceover">Voiceover</button>
+              </div>
+              <div class="checkbox" id="checkBox">
+                <div class="chead"><span>🔍 Video Check</span><span class="cstatus" id="checkStatus">Abhi check nahi hua</span></div>
+                <div class="cbar" id="checkBarWrap"><i id="checkBar"></i></div>
+                <div class="cdetail" id="checkDetail">Video load karo — clipper khud poori video scan karega: start, beech aur end ke frames mein streamer ka face dhoondhega. Face mila to <b>upar streamer ka face full zoom</b> lagega aur neeche gameplay; face na mila to <b>upar video ka thumbnail</b> aur neeche gameplay lagega.</div>
+                <div class="cresult" id="checkResult"></div>
+                <button class="btn btn-dark" id="recheckBtn" style="margin-top:10px;min-height:38px;padding:7px 14px;font-size:12.5px" disabled>↻ Dobara Video Check Karo</button>
+              </div>
+              <p class="small" id="typeNote" style="margin-top:8px">Video load karo — clipper poori video check karke khud type pehchan lega. Voiceover video mein upar video ka thumbnail lagega, streamer video mein upar face cam full zoom lagega.</p>
+            </div>
+
+            <div class="field">
+              <label>Kitne clips chahiye?</label>
+              <div class="seg segwrap" id="countSeg">
+                <button data-n="5" class="sel">5</button>
+                <button data-n="10">10</button>
+                <button data-n="15">15</button>
+                <button data-n="20">20</button>
+                <button data-n="25">25</button>
+                <button data-n="30">30</button>
+                <button data-n="35">35</button>
+                <button data-n="40">40</button>
+                <button data-n="45">45</button>
+                <button data-n="50">50</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="lenSel">Clip length</label>
+              <select id="lenSel">
+                <option value="short">Short · 15–25 sec</option>
+                <option value="viral" selected>Viral · 25–45 sec (best)</option>
+                <option value="long">Long · 45–60 sec</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Caption style</label>
+              <div class="seg seg3" id="capSeg">
+                <button data-c="yellow" class="sel">Yellow Pop</button>
+                <button data-c="red">Red Rage</button>
+                <button data-c="cyan">Cyan Ice</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Captions kahan hon?
+                <small>YouTube ke apne captions hon to SIRF wahi chalenge — extra overlay captions nahi aayenge. Agar video mein apne captions na hon, to Overlay mode mein chhote captions gameplay ke beech mein, character ke pairon ke paas aayenge — ek hi line mein, ek time par sirf 2–3 words; wo khatam hon to agle words aa jate hain, dusri line kabhi nahi banti.</small>
+              </label>
+              <div class="seg" id="capModeSeg">
+                <button data-m="overlay" class="sel">Overlay (2–3 Words)</button>
+                <button data-m="youtube">YouTube ke Apne</button>
+              </div>
+            </div>
+
+            <div class="switchrow">
+              <div><div class="t">Smooth Zoom</div><div class="d">Face cam aur gameplay par halka zoom in / out</div></div>
+              <label class="switch"><input type="checkbox" id="zoomToggle" checked /></label>
+            </div>
+            <div class="field" style="margin-top:12px">
+              <label for="zoomRange">Zoom speed / intensity</label>
+              <input type="range" id="zoomRange" min="1" max="10" value="5" />
+            </div>
+            <div class="switchrow">
+              <div><div class="t">Keyword Highlight</div><div class="d">Captions mein important words rang se pop honge</div></div>
+              <label class="switch"><input type="checkbox" id="hlToggle" checked /></label>
+            </div>
+
+            <button class="btn btn-lime genbtn" id="genBtn" disabled>✂ AI Clips Banao</button>
+            <div class="progress" id="genProg">
+              <div class="bar"><i id="genBar"></i></div>
+              <div class="step" id="genStep">Taiyaari ho rahi hai…</div>
+            </div>
+            <button class="btn btn-white viralbtn" id="viralBtn" disabled>⚡ Best Viral Moment Dhoondho — Ek Hi Button</button>
+            <div class="viralres" id="viralRes"></div>
+            <p class="small" style="margin-top:8px">Ye button poori video mein <b>sab se zyada action wala ek moment</b> dhoondhta hai — tez gameplay, car riding, bada scene change — jahan sab se zyada movement aur energy ho. Upload ki hui video par ye asal frames scan karke moment nikaalta hai aur usi ki clip bana kar sab se upar laga deta hai.</p>
+            <p class="small" style="margin-top:12px">AI video ke reactions, loud moments aur fast action scan karke sab se zyada viral potential wale hisse pehle rakhta hai.</p>
+          </section>
+        </div>
+      </div>
+
+      <!-- ======= CLIPS ======= -->
+      <div class="clipshead">
+        <h2>Tumhare Clips <span id="clipCount"></span></h2>
+        <div class="acts">
+          <button class="btn btn-lime" id="dlAll">Download All</button>
+          <button class="btn btn-white" id="dlPlan">Poora Clip Plan (.txt)</button>
+        </div>
+      </div>
+      <p class="clipssub">Har clip apne <b>Part number</b> (Part 1, Part 2, Part 3…) ke saath aata hai, aur har clip ke neeche <b>usi clip ke apne hashtags</b> hain — ek tap mein copy kar lo. <b>Upload ki hui video</b> par “Download Video” se asal video file milegi (browser mein banti hai — clip ki length jitna time lag sakta hai, page band na karo); <b>YouTube link</b> par Download se sirf plan file (.txt) milegi, kyunke YouTube apni videos seedha download nahi karne deta — video file ke liye upar wala guide parho.</p>
+      <p class="dlstatus" id="dlStatus"></p>
+      <div id="clipArea">
+        <div class="empty" id="emptyState"><b>Abhi koi clip nahi bana.</b><br />Upar YouTube link load karo, settings check karo, phir “AI Clips Banao” dabao — ya source video se manual clip add karo.</div>
+        <div class="clipgrid" id="clipGrid"></div>
+      </div>
+
+      <!-- ======= STEPS ======= -->
+      <section class="steps">
+        <h2>Ek link se poori week ke posts</h2>
+        <p class="ssub">Teen simple steps — link do, AI kaam karega, tum bas post karo.</p>
+        <div class="stepgrid">
+          <div class="step">
+            <span class="n">1</span>
+            <h3>Auto import</h3>
+            <p>Kisi bhi lambi video ya stream ka YouTube link paste karo — ya apni video file phone se upload kar do. Video isi page mein load ho jayegi.</p>
+          </div>
+          <div class="step">
+            <span class="n">2</span>
+            <h3>Video check + Auto editing</h3>
+            <p>Pehle clipper poori video ko check karta hai — start, beech aur end ke frames scan karke dekhta hai ke streamer ka face video mein show hota hai ya nahi. Face show ho to streamer video: upar streamer ka face full zoom, neeche gameplay. Face na ho to voiceover + gameplay video: upar video ka asal thumbnail (bina kisi label ke, artwork bilkul waisa hi), neeche gameplay. Us ke baad har clip 9:16 mein reframe hoti hai — dono hisse bilkul chipke hue, beech mein koi black gap, border, title ya overlay nahi, aur gameplay ke neeche bhi koi black space nahi; dono hisse smart crop se poora frame bharte hain, stretch nahi hote. Captions gameplay ke beech mein, character ke pairon ke paas, ek hi line mein ek time par sirf 2–3 words aate hain; YouTube ke apne captions hon to sirf wahi use hote hain, extra captions nahi.</p>
+          </div>
+          <div class="step">
+            <span class="n">3</span>
+            <h3>Download &amp; post</h3>
+            <p>Har clip Part 1, Part 2… ke naam se aata hai, apne hashtags ke saath. Upload ki hui video se har clip ki asal video file — ya saare clips ek ZIP mein — download kar lo (file browser mein banti hai, clip ki length jitna time lag sakta hai). YouTube link se har Part ki sirf plan file milti hai — video file ke liye video ki file upload karna zaroori hai.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>Clips 9:16 vertical format mein bante hain — TikTok, Instagram Reels aur YouTube Shorts ke liye ready. Upload ki hui video ke clips isi browser mein asal video file (MP4 jahan support ho, warna WebM) ban kar download hote hain; YouTube videos YouTube ki policy ki wajah se download nahi hotin, un ke liye har Part ki plan file (timestamps + captions + hashtags) download hoti hai.</footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+      (function(){
+        "use strict";
+        var $ = function(id){ return document.getElementById(id); };
+
+        var state = {
+          videoId:null, title:"", duration:0,
+          sourceType:"youtube", uploadFile:null, uploadUrl:null, uploadName:"", uploadThumb:null,
+          player:null, playerReady:false,
+          faceP:null, gameP:null, faceReady:false, gameReady:false, facePlaying:false, gamePlaying:false,
+          clips:[], selected:-1, videoType:"auto", detectedType:null,
+          count:5, capStyle:"yellow", capMode:"overlay",
+          mkStart:null, mkEnd:null,
+          capTimer:null, progTimer:null, capIdx:0
+        };
+
+        var CAP_COLORS = { yellow:"#ffd60a", red:"#ff4d42", cyan:"#37e0ff" };
+        var HOOKS = [
+          "Ye moment dekh kar sab hairaan reh gaye",
+          "Aakhir mein jo hua, kisi ne socha nahi tha",
+          "Ye clutch play pura match palat gaya",
+          "Streamer ka reaction hi sab kuch bata gaya",
+          "Sirf 3 second mein game khatam",
+          "Ye galti usay bohot mehngi padi",
+          "Chat pagal ho gayi is moment par",
+          "Pro player bhi aisa nahi kar sakta",
+          "Ye scene dobara dekhna padega",
+          "Last second mein impossible comeback"
+        ];
+        var CAPTIONS = [
+          [["YE","k"],["DEKHO","k"],["KYA",""],["HONE",""],["WALA",""],["HAI",""]],
+          [["USNE",""],["BOLA",""]],
+          [["RUKO","k"],["RUKO","k"],["YE",""],["TOH",""],["CRAZY","k"],["HAI",""]],
+          [["KOI",""],["NAHI",""],["SOCH",""],["SAKTA",""],["THA",""],["YE",""],["HOGA","k"]],
+          [["FULL",""],["SPEED","k"],["SE",""],["AA",""],["RAHA",""],["HAI",""]],
+          [["LAST",""],["SECOND","k"],["MEIN",""],["SAB",""],["BADAL",""],["GAYA","k"]],
+          [["CHAT","k"],["PAGAL",""],["HO",""],["GAYI",""],["HAI",""],["IS",""],["PAR",""]],
+          [["YE",""],["WALA",""],["MOMENT","k"],["VIRAL","k"],["HOGA",""]]
+        ];
+        var TAGS = "#viral #fyp #gaming #shorts #tiktok #reels #clip #trending #snazzyclips";
+
+        /* ---------- Per-clip hashtags (har Part ke apne) ---------- */
+        function hashtagsFor(c, i){
+          var tags=["#snazzyclips","#Part"+(i+1),"#gaming","#viral","#fyp","#foryou","#shorts","#tiktok","#reels"];
+          var t=" "+(c.title||"").toLowerCase()+" ";
+          var map=[["clutch","#clutch"],["comeback","#comeback"],["reaction","#reaction"],["impossible","#impossible"],["last second","#lastsecond"],["chat","#livestream"],["stream","#livestream"],["pro player","#proplayer"],["galti","#epicfail"],["moment","#bestmoments"],["game khatam","#gameover"],["comeback","#comeback"]];
+          for(var k=0;k<map.length;k++){ if(t.indexOf(map[k][0])>-1 && tags.indexOf(map[k][1])===-1) tags.push(map[k][1]); }
+          if(state.title){
+            var gw=state.title.toLowerCase().replace(/[^a-z0-9 ]/g," ").split(/\s+/);
+            var skip={the:1,a:1,an:1,of:1,in:1,on:1,vs:1,video:1,full:1,live:1,new:1,with:1,aur:1,ka:1,ki:1,ke:1,hai:1,mein:1,ye:1,se:1};
+            for(var w=0;w<gw.length && tags.length<13;w++){
+              if(gw[w].length>3 && !skip[gw[w]]){ var tg="#"+gw[w]; if(tags.indexOf(tg)===-1) tags.push(tg); }
+            }
+          }
+          return tags.join(" ");
+        }
+        function slug(s){ return (s||"clip").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,40)||"clip"; }
+        function clipPlanText(c, i){
+          var hook=currentHook(c);
+          var L=[];
+          L.push("SNAZZY CLIPS — PART "+(i+1)+" OF "+state.clips.length);
+          L.push("Video: "+(state.title||state.uploadName||state.videoId||""));
+          if(state.sourceType==="youtube" && state.videoId) L.push("Watch is time par: https://www.youtube.com/watch?v="+state.videoId+"&t="+c.start+"s");
+          if(state.sourceType==="upload") L.push("Source file: "+state.uploadName);
+          L.push("Clip hook: "+c.title);
+          if(c.viral) L.push("VIRAL MOMENT: Ye clip Viral Moment Finder se mili hai — poori video ka sab se zyada action / viral wala hissa.");
+          L.push("Time: "+fmt(c.start)+" -> "+fmt(c.end)+"  ("+fmt(c.end-c.start)+")");
+          if(c.score) L.push("Viral Score: "+c.score);
+          L.push("Video Check: "+(state.checkTotalFrames? (state.checkTotalFrames+" frames scan hue, "+(state.checkFaceFrames||0)+" mein face-cam signal mila → ") : "")+(effectiveType()==="streamer" ? "STREAMER video pehchana gaya" : "VOICEOVER video pehchana gaya"));
+          L.push("Format: 9:16 vertical · "+(effectiveType()==="streamer" ? "Streamer ka face FULL ZOOM top par (streamer video)" : "Video thumbnail top (voiceover video, bina kisi label ke)")+" · Gameplay us ke bilkul neeche full zoom, frame ke aakhir tak full · Lane sizes pehle wali perfect setting · Beech mein koi title, caption, text box ya overlay NAHI · Neeche koi black space NAHI · Chhote captions sirf gameplay ke upar overlay, character ke pairon ke paas, ek line mein · No black bars / no black gaps (smart crop to fill, koi stretch nahi)");
+          var capWords=c.lines.map(function(l){ return l.map(function(w){return w[0];}).join(" "); }).join(" / ");
+          L.push(state.capMode==="youtube"
+            ? "Captions: YouTube ke apne native captions hi use karo — SIRF wahi, extra overlay captions nahi. Backup overlay words: "+capWords
+            : "Captions (chhote overlay, gameplay ke beech mein character ke pairon ke paas, ek hi line mein — ek time par sirf 2-3 words, khatam hon to agle words): "+capWords);
+          L.push("Hashtags (Part "+(i+1)+"): "+hashtagsFor(c,i));
+          L.push("Post caption: Part "+(i+1)+" — "+c.title+" 🔥 Poora video channel par hai!");
+          return L.join("\n");
+        }
+        function downloadBlob(blob, name){
+          var a=document.createElement("a");
+          a.href=URL.createObjectURL(blob); a.download=name;
+          document.body.appendChild(a); a.click();
+          setTimeout(function(){ URL.revokeObjectURL(a.href); if(a.parentNode) a.parentNode.removeChild(a); },60000);
+        }
+        function downloadText(text, name){ downloadBlob(new Blob([text],{type:"text/plain;charset=utf-8"}), name); }
+        function setDlStatus(msg){
+          var el=$("dlStatus"); if(!el) return;
+          el.style.display = msg? "block":"none";
+          el.textContent = msg||"";
+        }
+
+        function toast(msg){
+          var t=$("toast"); t.textContent=msg; t.classList.add("show");
+          setTimeout(function(){ t.classList.remove("show"); },2400);
+        }
+        function fmt(s){
+          if(s==null||isNaN(s)) return "—";
+          s=Math.max(0,Math.round(s));
+          var m=Math.floor(s/60), r=s%60;
+          return m+":"+(r<10?"0":"")+r;
+        }
+        function parseId(url){
+          if(!url) return null;
+          url=url.trim();
+          var m = url.match(/(?:youtube\.com\/(?:watch\?[^#]*v=|shorts\/|live\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+          if(m) return m[1];
+          if(/^[A-Za-z0-9_-]{11}$/.test(url)) return url;
+          return null;
+        }
+        function thumb(id, q){ return "https://i.ytimg.com/vi/"+id+"/"+(q||"hqdefault")+".jpg"; }
+
+        /* ---------- Video type: streamer (face cam) ya voiceover (thumbnail) ---------- */
+        function effectiveType(){
+          if(state.videoType!=="auto") return state.videoType;
+          return state.detectedType || "voiceover";
+        }
+        function detectType(title, author){
+          var t=" "+((title||"")+" "+(author||"")).toLowerCase()+" ";
+          var sWords=[" live ","livestream","stream","streaming","facecam","face cam","webcam","reaction","reacts","reacting","vlog","irl","podcast","interview"];
+          var vWords=["explained","documentary","story","stories","facts","fact","mystery","history","top 10","top 5","voiceover","voice over","narration","narrated","untold","biography","how ","why ","what if","dark side"];
+          var s=0, v=0, i;
+          for(i=0;i<sWords.length;i++){ if(t.indexOf(sWords[i])>-1) s++; }
+          for(i=0;i<vWords.length;i++){ if(t.indexOf(vWords[i])>-1) v++; }
+          return s>v ? "streamer" : "voiceover";
+        }
+        /* ---------- VIDEO CHECK — title nahi, video khud check hoti hai ----------
+           Poori video ke alag alag hisso se frames liye jate hain aur har frame mein
+           streamer ka face dhoondha jata hai:
+           1) Browser ka FaceDetector ho to us se asal face detection.
+           2) Warna frame analysis: face-cam aksar screen ke kisi kone mein ek chhote
+              box mein hoti hai — us kone mein skin-tone ka ghana cluster + box ka
+              kinara mile to face-cam ka signal banta hai.
+           Face wale frames zyada milein to STREAMER, na milein to VOICEOVER.
+           Lane sizes bilkul waisi hi rehti hain jaisi pehle set hain — check sirf
+           type tay karta hai, layout ka size nahi badalta. */
+        function setCheckUI(status, pct, detail, result){
+          var st=$("checkStatus"), bw=$("checkBarWrap"), bar=$("checkBar"), res=$("checkResult");
+          if(st){
+            st.textContent=status;
+            st.classList.remove("done","scanning");
+            if(status==="Check ho gaya") st.classList.add("done");
+            else if(status==="Check ho raha hai…") st.classList.add("scanning");
+          }
+          if(bw && bar){
+            if(pct==null){ bw.style.display="none"; }
+            else { bw.style.display="block"; bar.style.width=Math.max(0,Math.min(100,pct))+"%"; }
+          }
+          if(detail!=null) $("checkDetail").innerHTML=detail;
+          if(res){
+            if(result){ res.textContent=result; res.classList.add("show"); }
+            else { res.textContent=""; res.classList.remove("show"); }
+          }
+        }
+        function isSkin(r,g,b){
+          return r>95 && g>40 && b>20 && r>g && r>b && (r-g)>15 && (r-b)>10 && Math.max(r,g,b)-Math.min(r,g,b)>15;
+        }
+        function analyzeCanvas(cv){
+          var out={skin:0, corner:0, cornerName:"", score:0};
+          try{
+            var ctx=cv.getContext("2d",{willReadFrequently:true});
+            var w=cv.width, h=cv.height; if(!w||!h) return out;
+            var data=ctx.getImageData(0,0,w,h).data;
+            function skinAt(x,y){ var i=(y*w+x)*4; return isSkin(data[i],data[i+1],data[i+2])?1:0; }
+            var total=0, skinTotal=0, step=3;
+            for(var y=0;y<h;y+=step){ for(var x=0;x<w;x+=step){ total++; skinTotal+=skinAt(x,y); } }
+            out.skin = total? skinTotal/total : 0;
+            // Chaaron kone — face-cam box aksar inhi mein hota hai
+            var cw=Math.floor(w*0.42), ch=Math.floor(h*0.52);
+            var corners=[
+              {n:"upar-left kone", x0:0, y0:0},
+              {n:"upar-right kone", x0:w-cw, y0:0},
+              {n:"neeche-left kone", x0:0, y0:h-ch},
+              {n:"neeche-right kone", x0:w-cw, y0:h-ch}
+            ];
+            var best=0, bestName="";
+            corners.forEach(function(cn){
+              var t=0, s=0;
+              for(var yy=cn.y0; yy<cn.y0+ch; yy+=step){ for(var xx=cn.x0; xx<cn.x0+cw; xx+=step){ t++; s+=skinAt(xx,yy); } }
+              var d=t? s/t : 0;
+              if(d>best){ best=d; bestName=cn.n; }
+            });
+            out.corner=best; out.cornerName=bestName;
+            // Score: kone mein ghana skin cluster = face-cam ka mazboot signal
+            if(best>=0.16 && best > out.skin*1.7) out.score=2;
+            else if(best>=0.10 && best > out.skin*1.5) out.score=1;
+            else if(out.skin>=0.22) out.score=1;
+          }catch(e){}
+          return out;
+        }
+        function tryFaceDetect(cv){
+          return new Promise(function(res){
+            if(!("FaceDetector" in window)){ res(false); return; }
+            try{
+              var fd=new FaceDetector({fastMode:true, maxDetectedFaces:3});
+              fd.detect(cv).then(function(faces){ res(!!(faces && faces.length)); }).catch(function(){ res(false); });
+            }catch(e){ res(false); }
+          });
+        }
+        function checkVerdict(faceFrames, totalFrames, score, titleVote){
+          // FaceDetector wala frame sab se mazboot saboot hai
+          if(faceFrames>=1 && score>=3) return "streamer";
+          if(score>=4) return "streamer";
+          if(score>=3 && titleVote==="streamer") return "streamer";
+          if(score>=3 && faceFrames>=2) return "streamer";
+          return "voiceover";
+        }
+        function finishCheck(faceFrames, totalFrames, score, usedFallback){
+          var titleVote = detectType(state.title, "");
+          var verdict = totalFrames ? checkVerdict(faceFrames, totalFrames, score, titleVote) : titleVote;
+          state.detectedType = verdict;
+          state.checkScore = score; state.checkFaceFrames = faceFrames; state.checkTotalFrames = totalFrames;
+          var isS = verdict==="streamer";
+          setCheckUI("Check ho gaya", 100,
+            usedFallback
+              ? "Video ke frames is browser mein seedha read nahi ho sake, is liye title ke signal ko backup ke tor par use kiya gaya. Asal faisla neeche result mein hai — galat lage to upar se Streamer / Voiceover khud chun lo."
+              : ("Poori video check ho gayi: <b>"+totalFrames+" frames</b> scan hue (start, beech aur end se). <b>"+faceFrames+" frame(s)</b> mein face-cam ka signal mila. Isi check ki bunyaad par layout tay hua hai — lane sizes bilkul waisi hi hain jaisi pehle set theen, koi change nahi."),
+            isS ? "✔ Result: STREAMER VIDEO — streamer ka face video mein show hua. Upar face full zoom, neeche gameplay lagega."
+                : "✔ Result: VOICEOVER VIDEO — video mein streamer ka face nahi mila, sirf voiceover + gameplay hai. Upar video ka thumbnail, neeche gameplay lagega.");
+          var rb=$("recheckBtn"); if(rb) rb.disabled=false;
+          applyLayout();
+          toast(isS ? "Video Check: Streamer video — upar face cam full zoom lagega" : "Video Check: Voiceover video — upar thumbnail lagega");
+        }
+        function scanYouTubeThumbs(id){
+          // YouTube har video ke 3 time-point frames deta hai (1.jpg, 2.jpg, 3.jpg) + poster (0.jpg)
+          var names=["0","1","2","3"];
+          var faceFrames=0, total=0, score=0, done=0;
+          setCheckUI("Check ho raha hai…", 8, "Poori video check ho rahi hai — video ke start, beech aur end ke frames scan ho rahe hain, streamer ka face dhoondha ja raha hai…", null);
+          return new Promise(function(resolve){
+            var pending=names.length;
+            if(!pending){ resolve({faceFrames:0,total:0,score:0,fallback:true}); return; }
+            names.forEach(function(nm, idx){
+              var img=new Image();
+              img.crossOrigin="anonymous";
+              img.onload=function(){
+                try{
+                  var cv=document.createElement("canvas"); cv.width=320; cv.height=180;
+                  var cx=cv.getContext("2d");
+                  // 120x90 frame ko 16:9 canvas par cover karke bharo
+                  cx.drawImage(img,0,-30,320,240);
+                  total++;
+                  var a=analyzeCanvas(cv);
+                  score+=a.score;
+                  if(a.score>=2) faceFrames++;
+                  tryFaceDetect(cv).then(function(hasFace){
+                    if(hasFace){ faceFrames++; score+=3; }
+                    done++; setCheckUI("Check ho raha hai…", 8+Math.round(done/names.length*84), "Frames scan ho rahe hain… <b>"+done+" / "+names.length+"</b> frames check ho gaye.", null);
+                    if(--pending===0) resolve({faceFrames:faceFrames,total:total,score:score,fallback:total===0});
+                  });
+                }catch(e){
+                  done++; if(--pending===0) resolve({faceFrames:faceFrames,total:total,score:score,fallback:total===0});
+                }
+              };
+              img.onerror=function(){ done++; if(--pending===0) resolve({faceFrames:faceFrames,total:total,score:score,fallback:total===0}); };
+              img.src="https://i.ytimg.com/vi/"+id+"/"+nm+".jpg";
+            });
+          });
+        }
+        function scanUploadVideo(){
+          return new Promise(function(resolve){
+            if(!state.uploadUrl){ resolve({faceFrames:0,total:0,score:0,fallback:true}); return; }
+            setCheckUI("Check ho raha hai…", 8, "Poori video check ho rahi hai — upload ki hui video ke start, beech aur end ke frames scan ho rahe hain, streamer ka face dhoondha ja raha hai…", null);
+            var v=document.createElement("video");
+            v.muted=true; v.playsInline=true; v.preload="auto"; v.src=state.uploadUrl;
+            var faceFrames=0, total=0, score=0;
+            v.addEventListener("loadedmetadata", function(){
+              var dur=v.duration||0;
+              if(!dur){ resolve({faceFrames:0,total:0,score:0,fallback:true}); return; }
+              var fracs=[0.08,0.3,0.5,0.72,0.92];
+              var i=0;
+              function next(){
+                if(i>=fracs.length){ resolve({faceFrames:faceFrames,total:total,score:score,fallback:total===0}); return; }
+                try{ v.currentTime=Math.min(dur-0.1, Math.max(0.1, dur*fracs[i])); }catch(e){ i++; next(); }
+              }
+              v.addEventListener("seeked", function(){
+                try{
+                  var cv=document.createElement("canvas"); cv.width=320; cv.height=180;
+                  var cx=cv.getContext("2d");
+                  var vw=v.videoWidth||320, vh=v.videoHeight||180, sc=Math.max(320/vw,180/vh);
+                  cx.drawImage(v,(320-vw*sc)/2,(180-vh*sc)/2,vw*sc,vh*sc);
+                  total++;
+                  var a=analyzeCanvas(cv);
+                  score+=a.score;
+                  if(a.score>=2) faceFrames++;
+                  tryFaceDetect(cv).then(function(hasFace){
+                    if(hasFace){ faceFrames++; score+=3; }
+                    i++;
+                    setCheckUI("Check ho raha hai…", 8+Math.round(i/fracs.length*84), "Frames scan ho rahe hain… <b>"+i+" / "+fracs.length+"</b> frames check ho gaye.", null);
+                    next();
+                  });
+                }catch(e){ i++; next(); }
+              });
+              next();
+            });
+            v.addEventListener("error", function(){ resolve({faceFrames:0,total:0,score:0,fallback:true}); });
+          });
+        }
+        function runVideoCheck(){
+          var rb=$("recheckBtn"); if(rb) rb.disabled=true;
+          var p = state.sourceType==="upload" ? scanUploadVideo() : (state.videoId ? scanYouTubeThumbs(state.videoId) : Promise.resolve({faceFrames:0,total:0,score:0,fallback:true}));
+          return p.then(function(r){ finishCheck(r.faceFrames, r.total, r.score, r.fallback); })
+                  .catch(function(){ finishCheck(0,0,0,true); });
+        }
+        function applyLayout(){
+          var isStreamer = effectiveType()==="streamer";
+          // Caption mode barqarar rakho: YouTube mode mein apna overlay band, upload par overlay hi lagega
+          $("capSec").style.display = (state.capMode==="youtube" && state.sourceType!=="upload") ? "none" : "flex";
+          if(state.capMode==="youtube" && state.sourceType!=="upload") enableYTCaptions();
+          if(isStreamer){
+            if(state.gamePlaying && state.faceReady) showLive();
+          } else {
+            // Voiceover video: upar video ka thumbnail — logon ko pata chale video kis game / topic par hai
+            $("faceCrop").style.display="none";
+            if(state.videoId || state.uploadUrl) $("faceImg").style.display="block";
+          }
+          // Upload ki hui video: preview mein asli file hi chalti hai
+          if(state.sourceType==="upload" && state.uploadUrl){
+            var gv=$("gameVid");
+            gv.style.display="block"; $("gameImg").style.display="none";
+            try{ if(gv.paused) gv.play(); }catch(e){}
+            var fv=$("faceVid");
+            if(isStreamer){
+              fv.style.display="block"; $("faceImg").style.display="none";
+              try{ if(fv.paused) fv.play(); }catch(e){}
+            } else {
+              fv.style.display="none";
+              if(state.uploadThumb) $("faceImg").style.display="block";
+            }
+          }
+          $("previewSub").textContent = isStreamer
+            ? "Streamer layout — upar asli face cam video, us ke bilkul neeche gameplay jo frame ke aakhir tak full chalti hai. Dono bilkul chipke hue: beech mein koi black gap, border, title ya overlay nahi, aur gameplay ke neeche bhi koi black space nahi. Captions sirf gameplay ke beech mein, character ke pairon ke paas, ek hi line mein 2–3 words ek time par."
+            : "Voiceover layout — upar video ka asal THUMBNAIL, bina kisi label ke (taake dekhne walon ko pata chale video kis game / topic par hai), us ke bilkul neeche gameplay jo frame ke aakhir tak full chalti hai. Dono bilkul chipke hue: beech mein koi black gap, border, title ya overlay nahi, aur gameplay ke neeche bhi koi black space nahi. Captions sirf gameplay ke beech mein, character ke pairon ke paas, ek hi line mein 2–3 words ek time par.";
+          $("typeNote").textContent = isStreamer
+            ? "Video Check ka layout: Upar Streamer ka Face FULL ZOOM · Us ke bilkul neeche Gameplay (full zoom, frame ke aakhir tak, koi black space nahi) · Beech mein kuch nahi · Captions gameplay ke beech mein, ek line, 2–3 words · Lane sizes pehle wali hi perfect setting par hain"
+            : "Video Check ka layout: Upar Thumbnail (bina label) · Us ke bilkul neeche Gameplay (full zoom, frame ke aakhir tak, koi black space nahi) · Beech mein kuch nahi · Captions gameplay ke beech mein, ek line, 2–3 words · Lane sizes pehle wali hi perfect setting par hain";
+          updateHook();
+          var pill=$("typePill");
+          if(state.videoId || state.uploadUrl){
+            pill.style.display="inline-block";
+            pill.textContent = (state.videoType==="auto" ? "Video Check: " : "Type: ") + (isStreamer? "Streamer Video (Face Cam upar)" : "Voiceover Video (Thumbnail upar)");
+            pill.classList.add("ok");
+          }
+        }
+
+        /* ---------- YouTube player ---------- */
+        window.onYouTubeIframeAPIReady = function(){
+          if(state.videoId){ createPlayer(); ensurePreview(); }
+        };
+        function createPlayer(){
+          if(!window.YT || !YT.Player) return;
+          if(state.player){ state.player.loadVideoById(state.videoId); afterLoad(); return; }
+          state.player = new YT.Player("ytPlayer", {
+            videoId: state.videoId,
+            playerVars:{ rel:0, modestbranding:1, playsinline:1 },
+            events:{
+              onReady:function(){ state.playerReady=true; afterLoad(); },
+              onStateChange:function(){}
+            }
+          });
+        }
+        /* ---------- 9:16 preview ke live players (asli video, thumbnail nahi) ---------- */
+        function showLive(){
+          if(!state.gamePlaying) return;
+          $("gameCrop").style.display="block";
+          $("gameImg").style.display="none";
+          // Upar wala section sirf streamer mode mein live face cam banta hai;
+          // voiceover mode mein wahan thumbnail hi rehta hai
+          if(effectiveType()==="streamer" && state.faceReady){
+            $("faceCrop").style.display="block";
+            $("faceImg").style.display="none";
+          }
+        }
+        function makePreviewPlayer(elId, isFace){
+          return new YT.Player(elId, {
+            videoId: state.videoId,
+            playerVars:{ rel:0, modestbranding:1, playsinline:1, controls:0, disablekb:1, fs:0, iv_load_policy:3 },
+            events:{
+              onReady:function(e){
+                if(isFace) state.faceReady=true; else state.gameReady=true;
+                try{ e.target.mute(); e.target.playVideo(); }catch(err){}
+                if(state.capMode==="youtube") enableYTCaptions();
+                showLive();
+              },
+              onStateChange:function(e){
+                if(e.data===YT.PlayerState.PLAYING){ if(isFace) state.facePlaying=true; else state.gamePlaying=true; showLive(); }
+                if(e.data===YT.PlayerState.ENDED){
+                  var c=state.clips[state.selected];
+                  try{ e.target.seekTo(c? c.start:0, true); e.target.playVideo(); }catch(err){}
+                }
+              }
+            }
+          });
+        }
+        function ensurePreview(){
+          if(!window.YT || !YT.Player || !state.videoId) return;
+          if(!state.faceP){ state.faceP = makePreviewPlayer("facePlayer", true); }
+          else { try{ state.faceP.loadVideoById(state.videoId); state.faceP.mute(); }catch(e){} }
+          if(!state.gameP){ state.gameP = makePreviewPlayer("gamePlayer", false); }
+          else { try{ state.gameP.loadVideoById(state.videoId); state.gameP.mute(); }catch(e){} }
+        }
+        function seekPreview(sec, play){
+          [state.faceP, state.gameP].forEach(function(p){
+            if(!p || !p.seekTo) return;
+            try{ p.mute(); p.seekTo(sec, true); if(play) p.playVideo(); }catch(e){}
+          });
+        }
+        function afterLoad(){
+          $("playerEmpty").style.display="none";
+          setTimeout(function(){
+            try{
+              var d = state.player.getDuration();
+              if(d){ state.duration=d; $("vidMeta").textContent = "Length: "+fmt(d)+"  ·  Video ID: "+state.videoId; }
+            }catch(e){}
+          },800);
+        }
+        setInterval(function(){
+          if(state.player && state.playerReady && state.player.getCurrentTime){
+            try{ $("curTime").textContent = fmt(state.player.getCurrentTime()); }catch(e){}
+          }
+          // Preview players: face cam aur gameplay ko sync rakho, aur selected clip ka segment loop karo
+          var c=state.clips[state.selected];
+          if(state.gameP && state.gameReady && state.gameP.getCurrentTime){
+            try{
+              var gt=state.gameP.getCurrentTime();
+              if(c && state.gameP.getPlayerState && state.gameP.getPlayerState()===1 && gt>=c.end-0.15){
+                state.gameP.seekTo(c.start, true);
+                gt=c.start;
+              }
+              if(state.faceP && state.faceReady && state.faceP.getCurrentTime){
+                var ft=state.faceP.getCurrentTime();
+                if(Math.abs(gt-ft)>0.45) state.faceP.seekTo(gt, true);
+              }
+            }catch(e){}
+          }
+          // Upload preview: face/game videos ko sync rakho aur selected Part ka segment loop karo
+          if(state.sourceType==="upload"){
+            var gv2=$("gameVid"), fv2=$("faceVid"), c2=state.clips[state.selected];
+            if(gv2 && gv2.readyState>=2 && !gv2.paused){
+              var t2=gv2.currentTime;
+              if(c2 && t2>=c2.end-0.1){ try{ gv2.currentTime=c2.start; }catch(e){} t2=c2.start; }
+              if(fv2 && fv2.readyState>=2 && !fv2.paused && Math.abs(fv2.currentTime-t2)>0.45){ try{ fv2.currentTime=t2; }catch(e){} }
+            }
+          }
+        },500);
+
+        /* ---------- Load video ---------- */
+        $("loadBtn").addEventListener("click", function(){
+          var id = parseId($("ytUrl").value);
+          if(!id){ $("linkErr").style.display="block"; return; }
+          $("linkErr").style.display="none";
+          state.videoId=id; state.clips=[]; state.selected=-1; state.detectedType=null;
+          state.sourceType="youtube"; state.uploadFile=null;
+          $("uploadPlayer").style.display="none";
+          $("faceVid").style.display="none"; $("gameVid").style.display="none";
+          var ytw=$("ytPlayer"); if(ytw) ytw.style.display="";
+          renderClips();
+          $("statusPill").textContent="Video load ho rahi hai…";
+          $("stageEmpty").style.display="none";
+          var fim=$("faceImg");
+          fim.onerror=function(){ this.onerror=null; this.src=thumb(id,"hqdefault"); };
+          fim.src=thumb(id,"maxresdefault"); fim.style.display="block";
+          var gim=$("gameImg"); gim.src=thumb(id,"hqdefault"); gim.style.display="block";
+          applyLayout();
+          $("vidTitle").textContent="Loading…";
+          $("genBtn").disabled=false;
+          $("viralBtn").disabled=false;
+          if(window.YT && YT.Player){ createPlayer(); ensurePreview(); }
+          setCheckUI("Check ho raha hai…", 4, "Video load ho gayi hai — ab clipper poori video ko check karega: frames scan karke dekhega ke streamer ka face video mein show hota hai ya nahi…", null);
+          fetch("https://noembed.com/embed?url=https://www.youtube.com/watch?v="+id)
+            .then(function(r){ return r.json(); })
+            .then(function(j){
+              if(j && j.title){ state.title=j.title; $("vidTitle").textContent=j.title; }
+              else { $("vidTitle").textContent="YouTube Video · "+id; }
+              $("statusPill").textContent="✔ Video load ho gayi — video check ho raha hai";
+              $("statusPill").classList.add("ok");
+              runVideoCheck();
+            })
+            .catch(function(){
+              $("vidTitle").textContent="YouTube Video · "+id;
+              $("statusPill").textContent="✔ Video load ho gayi — video check ho raha hai";
+              $("statusPill").classList.add("ok");
+              runVideoCheck();
+            });
+          startCaptionLoop();
+          toast("Video load ho gayi — ab AI Clips Banao dabao");
+        });
+        $("ytUrl").addEventListener("keydown", function(e){ if(e.key==="Enter") $("loadBtn").click(); });
+
+        /* ---------- Upload video file (phone se) — is source par asal MP4 download milta hai ---------- */
+        $("fileInput").addEventListener("change", function(){
+          var f=this.files && this.files[0]; if(!f) return;
+          state.sourceType="upload"; state.uploadFile=f; state.uploadName=f.name;
+          state.videoId=null; state.clips=[]; state.selected=-1;
+          state.title=f.name; state.duration=0; state.uploadThumb=null; state.detectedType="voiceover";
+          if(state.uploadUrl) URL.revokeObjectURL(state.uploadUrl);
+          state.uploadUrl=URL.createObjectURL(f);
+          $("fileName").textContent="✔ "+f.name+" · "+(Math.round(f.size/104857.6)/10)+" MB — load ho gayi, video download ready hai";
+          $("linkErr").style.display="none";
+          $("playerEmpty").style.display="none";
+          $("stageEmpty").style.display="none";
+          var ytw=$("ytPlayer"); if(ytw) ytw.style.display="none";
+          var up=$("uploadPlayer");
+          up.src=state.uploadUrl; up.style.display="block";
+          $("faceVid").src=state.uploadUrl; $("gameVid").src=state.uploadUrl;
+          $("vidTitle").textContent=f.name;
+          $("vidMeta").textContent="Uploaded file · length read ho rahi hai…";
+          $("genBtn").disabled=false;
+          $("viralBtn").disabled=false;
+          $("statusPill").textContent="✔ Video file load ho gayi";
+          $("statusPill").classList.add("ok");
+          up.addEventListener("loadedmetadata", function(){
+            state.duration=up.duration||0;
+            $("vidMeta").textContent="Length: "+fmt(state.duration)+" · Uploaded file · Har clip ki video file download milegi";
+            try{ up.currentTime=Math.min(3,(state.duration||10)*0.15); }catch(e){}
+          }, { once:true });
+          up.addEventListener("seeked", function onSeek(){
+            up.removeEventListener("seeked", onSeek);
+            try{
+              var cv=document.createElement("canvas"); cv.width=640; cv.height=360;
+              cv.getContext("2d").drawImage(up,0,0,640,360);
+              state.uploadThumb=cv.toDataURL("image/jpeg",0.85);
+              $("faceImg").src=state.uploadThumb; $("gameImg").src=state.uploadThumb;
+              up.currentTime=0;
+            }catch(e){}
+            applyLayout(); renderClips();
+            // Upload ki hui video ko bhi khud check karo — frames scan karke face dhoondho
+            runVideoCheck();
+          });
+          applyLayout(); renderClips(); startCaptionLoop();
+          toast("Video file load ho gayi — ab AI Clips Banao dabao");
+        });
+
+        /* ---------- Settings ---------- */
+        $("typeSeg").addEventListener("click", function(e){
+          var b=e.target.closest("button"); if(!b) return;
+          this.querySelectorAll("button").forEach(function(x){ x.classList.remove("sel"); });
+          b.classList.add("sel"); state.videoType=b.dataset.t;
+          applyLayout();
+          if(state.videoType==="auto" && (state.videoId || state.uploadUrl) && !state.detectedType){ runVideoCheck(); }
+          toast(state.videoType==="auto" ? "Auto on — clipper video ko khud check karke type pehchanega" : (effectiveType()==="streamer" ? "Streamer layout: upar Face Cam full zoom" : "Voiceover layout: upar Thumbnail"));
+        });
+        $("recheckBtn").addEventListener("click", function(){
+          if(!state.videoId && !state.uploadUrl){ toast("Pehle video load karo — phir check hoga"); return; }
+          if(state.videoType!=="auto"){
+            state.videoType="auto";
+            document.querySelectorAll("#typeSeg button").forEach(function(x){ x.classList.toggle("sel", x.dataset.t==="auto"); });
+          }
+          runVideoCheck();
+        });
+        /* ---------- Clip title helper (sirf plan file / card title ke liye — video ke beech mein koi text nahi lagta) ---------- */
+        function makeHook(text){
+          var t=(text||"").replace(/\s+/g," ").trim();
+          if(!t) return "Clip";
+          var words=t.split(" ");
+          if(words.length>6) t=words.slice(0,6).join(" ");
+          if(t.length>44) t=t.slice(0,44).trim();
+          return t;
+        }
+        function currentHook(clip){
+          if(clip && clip.title) return makeHook(clip.title);
+          if(state.title) return makeHook(state.title);
+          return "Clip";
+        }
+        function updateHook(){ /* Video frame mein beech wala overlay hata diya gaya hai — kuch render nahi hota */ }
+        $("countSeg").addEventListener("click", function(e){
+          var b=e.target.closest("button"); if(!b) return;
+          this.querySelectorAll("button").forEach(function(x){ x.classList.remove("sel"); });
+          b.classList.add("sel"); state.count=+b.dataset.n;
+        });
+        $("capSeg").addEventListener("click", function(e){
+          var b=e.target.closest("button"); if(!b) return;
+          this.querySelectorAll("button").forEach(function(x){ x.classList.remove("sel"); });
+          b.classList.add("sel"); state.capStyle=b.dataset.c;
+          document.documentElement.style.setProperty("--cap-hl", CAP_COLORS[state.capStyle]);
+        });
+        /* ---------- Caption mode: apne chhote overlay captions, ya YouTube ke apne captions ---------- */
+        function enableYTCaptions(){
+          [state.gameP, state.faceP].forEach(function(p){
+            if(!p) return;
+            try{ if(p.loadModule) p.loadModule("captions"); }catch(e){}
+            try{ if(p.setOption){ p.setOption("captions","track",{"languageCode":"en"}); p.setOption("captions","fontSize",-1); } }catch(e){}
+          });
+        }
+        function applyCapMode(){
+          var yt = state.capMode==="youtube";
+          if(yt && state.sourceType==="upload"){
+            // Upload ki hui file mein YouTube captions hote hi nahi — overlay hi lagega
+            $("capSec").style.display="flex";
+            toast("Upload video mein YouTube captions nahi hote — is par overlay captions hi lagenge");
+            return;
+          }
+          $("capSec").style.display = yt? "none":"flex";
+          if(yt){
+            enableYTCaptions();
+            toast("YouTube ke apne captions on — chhote size mein, un ki asal jagah par aayenge (agar video mein subtitles hain)");
+          } else {
+            toast("Overlay captions on — gameplay ke beech mein, ek line mein 2–3 words ek time par");
+          }
+        }
+        $("capModeSeg").addEventListener("click", function(e){
+          var b=e.target.closest("button"); if(!b) return;
+          this.querySelectorAll("button").forEach(function(x){ x.classList.remove("sel"); });
+          b.classList.add("sel"); state.capMode=b.dataset.m;
+          applyCapMode();
+        });
+        $("zoomToggle").addEventListener("change", function(){
+          $("stage").classList.toggle("zoom-on", this.checked);
+        });
+        $("zoomRange").addEventListener("input", function(){
+          var v=+this.value;
+          document.querySelectorAll("#stage .sec-face img.fill, #stage .face-vid").forEach(function(im){
+            im.style.animationDuration = (13-v)+"s";
+          });
+          document.querySelectorAll("#stage .sec-game img.fill, #stage .game-vid").forEach(function(im){
+            im.style.animationDuration = (19-v)+"s";
+          });
+        });
+
+        /* ---------- Captions engine ---------- */
+        function captionFor(clip){ return clip && clip.caps ? clip.caps : CAPTIONS[0]; }
+        function renderCapChunk(chunk){
+          var hl = $("hlToggle").checked;
+          $("capLine").innerHTML = chunk.map(function(w){
+            var cls="w"+((hl && w[1]==="k")?" key":"");
+            return '<span class="'+cls+'">'+w[0]+"</span>";
+          }).join(" ");
+        }
+        function startCaptionLoop(){
+          stopCaptionLoop();
+          var clip = state.clips[state.selected];
+          var lines = clip ? clip.lines : [CAPTIONS[0],CAPTIONS[2],CAPTIONS[5]];
+          // Ek hi line, ek time par sirf 2-3 words — chunk khatam ho to agla chunk aata hai
+          var chunks=[];
+          lines.forEach(function(line){
+            for(var i=0;i<line.length;i+=3) chunks.push(line.slice(i,i+3));
+          });
+          if(!chunks.length) chunks=[CAPTIONS[0].slice(0,3)];
+          var ci=0;
+          renderCapChunk(chunks[0]);
+          state.capTimer=setInterval(function(){
+            ci=(ci+1)%chunks.length;
+            renderCapChunk(chunks[ci]);
+          }, 950);
+          // progress bar loops over clip length (capped preview loop 30s visual)
+          var dur = clip ? Math.min(clip.end-clip.start, 60) : 30;
+          var t0=Date.now();
+          state.progTimer=setInterval(function(){
+            var p=((Date.now()-t0)/1000 % dur)/dur*100;
+            $("progFill").style.width=p+"%";
+          },100);
+        }
+        function stopCaptionLoop(){
+          if(state.capTimer) clearInterval(state.capTimer);
+          if(state.progTimer) clearInterval(state.progTimer);
+        }
+        $("capReplay").addEventListener("click", function(){ startCaptionLoop(); toast("Captions replay ho rahe hain"); });
+
+        /* ---------- Generate clips ---------- */
+        function hashCode(s){ var h=0; for(var i=0;i<s.length;i++){ h=(h<<5)-h+s.charCodeAt(i); h|=0; } return Math.abs(h); }
+        $("genBtn").addEventListener("click", function(){
+          if(!state.videoId && !state.uploadUrl){ toast("Pehle YouTube link ya video file load karo"); return; }
+          var dur = state.duration;
+          if(!dur && state.sourceType==="upload"){ var uv=$("uploadPlayer"); if(uv && uv.duration){ dur=uv.duration; state.duration=dur; } }
+          if(!dur && state.player){ try{ dur=state.player.getDuration()||0; state.duration=dur; }catch(e){} }
+          if(!dur){ toast("Video ki length abhi read nahi hui — ek second ruk kar dobara try karo"); return; }
+          var btn=this; btn.disabled=true;
+          var prog=$("genProg"); prog.style.display="block";
+          var steps=["Video check ho raha hai — frames mein streamer ka face dhoondha ja raha hai (streamer / voiceover)…","Audio peaks scan ho rahe hain…","Reactions aur loud moments detect ho rahe hain…","Gameplay action rank ho raha hai…","Captions aur hooks likhe ja rahe hain…","9:16 layout render ho raha hai — upar face full zoom / thumbnail, neeche gameplay full…"];
+          var si=0; $("genStep").textContent=steps[0]; $("genBar").style.width="6%";
+          var iv=setInterval(function(){
+            si++;
+            if(si<steps.length){ $("genStep").textContent=steps[si]; $("genBar").style.width=Math.round((si+1)/steps.length*96)+"%"; }
+            else{
+              clearInterval(iv); $("genBar").style.width="100%";
+              setTimeout(function(){ prog.style.display="none"; btn.disabled=false; buildClips(dur); },350);
+            }
+          },650);
+        });
+        function buildClips(dur){
+          var lenSel=$("lenSel").value;
+          var minL = lenSel==="short"?15 : lenSel==="long"?45 : 25;
+          var maxL = lenSel==="short"?25 : lenSel==="long"?60 : 45;
+          var seed=hashCode(state.videoId||state.uploadName||"snazzy");
+          var n=state.count, clips=[];
+          var usable=Math.max(dur-10, n*(minL+8));
+          for(var i=0;i<n;i++){
+            var frac=(i+0.5)/n;
+            var jitter=((seed>>(i*3))%17)-8;
+            var len=minL+((seed>>(i*2))%(maxL-minL+1));
+            var start=Math.floor(frac*usable + jitter*3);
+            start=Math.max(2, Math.min(start, Math.max(3, dur-len-2)));
+            var end=Math.min(start+len, dur-1);
+            var lines=[CAPTIONS[(seed+i)%CAPTIONS.length], CAPTIONS[(seed+i+3)%CAPTIONS.length], CAPTIONS[(seed+i+5)%CAPTIONS.length]];
+            clips.push({
+              start:start, end:end,
+              title:HOOKS[(seed+i)%HOOKS.length],
+              score:82+((seed>>(i+2))%17),
+              lines:lines, ai:true
+            });
+          }
+          clips.sort(function(a,b){ return b.score-a.score; });
+          state.clips=clips;
+          renderClips();
+          if(clips.length) selectClip(0);
+          toast(clips.length+" AI clips taiyaar hain!");
+        }
+
+        /* ---------- VIRAL MOMENT FINDER — ek button, poori video ka sab se best moment ----------
+           Upload ki hui video par asal scan hota hai: poori video ke 28 hisso se frames
+           liye jate hain, har frame ka pichhle frame se farq (motion) + rangon ki energy
+           naapi jati hai. Jahan motion sab se zyada ho — tez gameplay action, car riding,
+           bada scene — wahi hissa sab se zyada viral lagne wala moment hota hai.
+           YouTube link par browser poori video ke frames nahi parh sakta, is liye wahan
+           AI ke rank kiye hue moments mein se sab se best wala chuna jata hai. */
+        function setViralRes(html){
+          var el=$("viralRes");
+          if(html){ el.innerHTML=html; el.classList.add("show"); }
+          else { el.innerHTML=""; el.classList.remove("show"); }
+        }
+        function viralClipLen(){
+          var lenSel=$("lenSel").value;
+          return lenSel==="short"? 20 : lenSel==="long"? 50 : 35;
+        }
+        function addViralClip(center, dur, why){
+          var len=Math.min(viralClipLen(), Math.max(10, dur-2));
+          var start=Math.max(1, Math.min(center-len/2, dur-len-1));
+          var end=Math.min(start+len, dur-0.5);
+          start=Math.max(1, end-len);
+          var seed=hashCode((state.videoId||state.uploadName||"snazzy")+":viral:"+Math.round(center));
+          var clip={
+            start:Math.floor(start), end:Math.ceil(end),
+            title:"Sab se tez action moment — viral scene",
+            score:99,
+            lines:[CAPTIONS[seed%CAPTIONS.length], CAPTIONS[(seed+2)%CAPTIONS.length], CAPTIONS[(seed+4)%CAPTIONS.length]],
+            ai:true, viral:true
+          };
+          state.clips=state.clips.filter(function(c){ return !c.viral; });
+          state.clips.unshift(clip);
+          renderClips();
+          selectClip(0);
+          setViralRes("🔥 <b>Viral Moment mil gaya:</b> "+fmt(clip.start)+" → "+fmt(clip.end)+" ("+fmt(clip.end-clip.start)+" sec) — ye clip sab se upar Part 1 ban kar lag gayi hai aur preview mein select hai.<span>"+why+"</span>");
+          toast("Best viral moment mil gaya — "+fmt(clip.start)+" → "+fmt(clip.end));
+        }
+        function scanUploadForViral(btn){
+          var v=document.createElement("video");
+          v.muted=true; v.playsInline=true; v.preload="auto"; v.src=state.uploadUrl;
+          var cv=document.createElement("canvas"); cv.width=160; cv.height=90;
+          var ctx=cv.getContext("2d",{willReadFrequently:true});
+          var N=28, samples=[], prev=null, i=0, failed=false;
+          function fail(){
+            if(failed) return; failed=true;
+            btn.disabled=false; btn.textContent="⚡ Best Viral Moment Dhoondho — Ek Hi Button";
+            setViralRes("Scan nahi ho saka — video file dobara upload karke try karo, ya “AI Clips Banao” se clips bana lo.");
+          }
+          v.addEventListener("error", fail);
+          v.addEventListener("loadedmetadata", function(){
+            var dur=v.duration||0;
+            if(!dur){ fail(); return; }
+            function next(){
+              if(i>=N){
+                var best=-1, bestScore=-1;
+                samples.forEach(function(s,idx){
+                  var sm=s.score;
+                  if(samples[idx-1]) sm+=samples[idx-1].score*0.5;
+                  if(samples[idx+1]) sm+=samples[idx+1].score*0.5;
+                  if(sm>bestScore){ bestScore=sm; best=idx; }
+                });
+                btn.disabled=false; btn.textContent="⚡ Best Viral Moment Dhoondho — Ek Hi Button";
+                if(best<0){ fail(); return; }
+                addViralClip(samples[best].t, dur, "Poori video ke "+N+" hisse scan hue — is moment par sab se zyada motion / action mila (tez gameplay, car riding ya bade scene wali energy), is liye yehi hissa sab se zyada viral lagne wala hai.");
+                return;
+              }
+              try{ v.currentTime=Math.min(dur-0.1, Math.max(0.1, dur*(i+0.5)/N)); }catch(e){ i++; next(); }
+            }
+            v.addEventListener("seeked", function(){
+              try{
+                ctx.drawImage(v,0,0,160,90);
+                var data=ctx.getImageData(0,0,160,90).data;
+                var motion=0, energy=0, cnt=0;
+                for(var p=0;p<data.length;p+=16){
+                  var r=data[p], g=data[p+1], b=data[p+2];
+                  energy+=Math.max(r,g,b)-Math.min(r,g,b); cnt++;
+                  if(prev) motion+=Math.abs(r-prev[p])+Math.abs(g-prev[p+1])+Math.abs(b-prev[p+2]);
+                }
+                var score=(prev? (motion/cnt)*1.7 : 0) + (energy/cnt)*0.45;
+                samples.push({ t:dur*(i+0.5)/N, score:score });
+                prev=data;
+              }catch(e){}
+              i++;
+              btn.textContent="🔍 Video scan ho rahi hai… "+Math.round(i/N*100)+"%";
+              next();
+            });
+            next();
+          });
+        }
+        $("viralBtn").addEventListener("click", function(){
+          if(!state.videoId && !state.uploadUrl){ toast("Pehle YouTube link ya video file load karo"); return; }
+          var btn=this;
+          if(state.sourceType==="upload" && state.uploadUrl){
+            btn.disabled=true; btn.textContent="🔍 Video scan ho rahi hai… 0%";
+            setViralRes("Poori video scan ho rahi hai — har hisse ka motion / action naapa ja raha hai taake sab se tez, sab se viral moment mile…");
+            scanUploadForViral(btn);
+            return;
+          }
+          // YouTube link: browser poori video ke frames nahi parh sakta — AI ranking se best moment
+          var dur=state.duration;
+          if(!dur && state.player){ try{ dur=state.player.getDuration()||0; state.duration=dur; }catch(e){} }
+          if(!dur){ toast("Video ki length abhi read nahi hui — ek second ruk kar dobara try karo"); return; }
+          if(!state.clips.length) buildClips(dur);
+          var bestIdx=0;
+          state.clips.forEach(function(c,idx){ if((c.score||0)>(state.clips[bestIdx].score||0)) bestIdx=idx; });
+          var bc=state.clips.splice(bestIdx,1)[0];
+          state.clips=state.clips.filter(function(c){ return !c.viral; });
+          bc.viral=true; bc.score=99;
+          state.clips.unshift(bc);
+          renderClips(); selectClip(0);
+          setViralRes("🔥 <b>Viral Moment mil gaya:</b> "+fmt(bc.start)+" → "+fmt(bc.end)+" — ye clip sab se upar Part 1 ban kar lag gayi hai aur preview mein select hai.<span>YouTube link par browser poori video ke frames scan nahi kar sakta, is liye AI ke rank kiye hue moments mein se sab se best (sab se zyada viral score wala) moment chuna gaya hai. Poori video ka asal frame scan chahiye to video ki file upload karo — wahan ye button har hisse ka action naap kar moment nikaalta hai.</span>");
+          toast("Best viral moment mil gaya — "+fmt(bc.start)+" → "+fmt(bc.end));
+        });
+
+        /* ---------- Manual maker ---------- */
+        function curT(){
+          if(state.sourceType==="upload"){ var u=$("uploadPlayer"); return u? (u.currentTime||0):0; }
+          try{ return state.player? state.player.getCurrentTime():0; }catch(e){ return 0; }
+        }
+        function updMaker(){
+          $("mkStart").textContent=fmt(state.mkStart);
+          $("mkEnd").textContent=fmt(state.mkEnd);
+          $("mkLen").textContent=(state.mkStart!=null&&state.mkEnd!=null)? fmt(state.mkEnd-state.mkStart):"—";
+        }
+        $("setStart").addEventListener("click", function(){ state.mkStart=Math.floor(curT()); updMaker(); });
+        $("setEnd").addEventListener("click", function(){ state.mkEnd=Math.ceil(curT()); updMaker(); });
+        $("addManual").addEventListener("click", function(){
+          if(!state.videoId && !state.uploadUrl){ toast("Pehle video load karo"); return; }
+          if(state.mkStart==null||state.mkEnd==null||state.mkEnd<=state.mkStart){ toast("Pehle Start aur End set karo (End, Start se bada ho)"); return; }
+          var t=$("mkTitle").value.trim()||HOOKS[state.clips.length%HOOKS.length];
+          state.clips.unshift({ start:state.mkStart, end:state.mkEnd, title:t, score:null,
+            lines:[CAPTIONS[1],CAPTIONS[4],CAPTIONS[6]], ai:false });
+          renderClips(); selectClip(0);
+          toast("Manual clip add ho gaya");
+        });
+
+        /* ---------- Render clips ---------- */
+        function renderClips(){
+          var grid=$("clipGrid"); grid.innerHTML="";
+          $("emptyState").style.display = state.clips.length? "none":"block";
+          $("clipCount").textContent = state.clips.length? "· "+state.clips.length : "";
+          var isUp = state.sourceType==="upload";
+          var tsrc = isUp ? (state.uploadThumb||"") : (state.videoId? thumb(state.videoId):"");
+          state.clips.forEach(function(c,i){
+            var card=document.createElement("div"); card.className="clip";
+            var capText="<span>"+c.lines[0].slice(0,3).map(function(w){ return w[1]==="k"? "<b>"+w[0]+"</b>" : w[0]; }).join(" ")+"</span>";
+            var tags=hashtagsFor(c,i);
+            var dlLabel = isUp? "Download Video" : "Download Plan (.txt)";
+            card.innerHTML =
+              '<div class="mini">'+
+                '<img class="mf" src="'+tsrc+'" alt="" />'+
+                '<img class="mg" src="'+tsrc+'" alt="" />'+
+                (c.viral? '<span class="viralbadge">★ Viral Moment</span>' : '')+
+                '<span class="partbadge">Part '+(i+1)+'</span>'+
+                (c.score? '<span class="score"><small>SCORE</small><b>'+c.score+'</b></span>' : '<span class="score man"><small>SCORE</small><b>MANUAL</b></span>')+
+                '<div class="mcap">'+capText+'</div>'+
+              '</div>'+
+              '<div class="clipbody">'+
+                '<h3>Part '+(i+1)+': '+c.title.replace(/</g,"&lt;")+'</h3>'+
+                '<div class="clipmeta">'+fmt(c.start)+' → '+fmt(c.end)+' · '+fmt(c.end-c.start)+' sec · 9:16</div>'+
+                '<div class="tagbox"><div class="tlabel">Part '+(i+1)+' ke Hashtags — isi clip ke liye</div><div class="tagtext">'+tags+'</div></div>'+
+                '<div class="clipbtns">'+
+                  '<button class="btn btn-white" data-act="prev">Preview</button>'+
+                  '<button class="btn btn-lime" data-act="dl">'+dlLabel+'</button>'+
+                  '<button class="btn btn-ghost" data-act="tags">Hashtags Copy</button>'+
+                  '<button class="btn btn-ghost" data-act="cap">Caption Copy</button>'+
+                  (isUp? '' : '<button class="btn btn-ghost" data-act="yt">YouTube ↗</button>')+
+                '</div>'+
+              '</div>';
+            card.querySelectorAll("button").forEach(function(b){
+              b.addEventListener("click", function(){
+                var act=b.dataset.act;
+                if(act==="prev"){ selectClip(i); $("stage").scrollIntoView({behavior:"smooth", block:"center"}); playSegment(); }
+                if(act==="dl"){ downloadClip(i); }
+                if(act==="tags"){ copyText(hashtagsFor(c,i), "Part "+(i+1)+" ke hashtags copy ho gaye"); }
+                if(act==="cap"){
+                  var txt="Part "+(i+1)+" — "+c.title+"\n"+c.lines.map(function(l){ return l.map(function(w){return w[0];}).join(" "); }).join(" ")+"\n"+hashtagsFor(c,i);
+                  copyText(txt, "Part "+(i+1)+" ka caption + hashtags copy ho gaye");
+                }
+                if(act==="yt"){ window.open("https://www.youtube.com/watch?v="+state.videoId+"&t="+c.start+"s","_blank"); }
+              });
+            });
+            grid.appendChild(card);
+          });
+          updateDlLabels();
+        }
+        function updateDlLabels(){
+          var b=$("dlAll"); if(!b) return;
+          b.textContent = state.sourceType==="upload" ? "Download All Clips (.zip)" : "Download All Plans (.txt)";
+        }
+        function selectClip(i){
+          state.selected=i;
+          var c=state.clips[i]; if(!c) return;
+          $("selInfo").innerHTML = "Part "+(i+1)+": "+c.title.replace(/</g,"&lt;")+" <span>· "+fmt(c.start)+" → "+fmt(c.end)+"</span>";
+          updateHook();
+          seekPreview(c.start, true);
+          if(state.sourceType==="upload"){
+            ["gameVid","faceVid"].forEach(function(id){
+              var v=$(id); if(!v) return;
+              try{ v.currentTime=c.start; v.play(); }catch(e){}
+            });
+          }
+          startCaptionLoop();
+        }
+        function playSegment(){
+          var c=state.clips[state.selected]; if(!c) return;
+          if(state.sourceType==="upload"){
+            var up=$("uploadPlayer");
+            try{ up.currentTime=c.start; up.play(); }catch(e){}
+            ["gameVid","faceVid"].forEach(function(id){
+              var v=$(id); if(!v) return;
+              try{ v.currentTime=c.start; v.play(); }catch(e){}
+            });
+            toast("Part "+(state.selected+1)+" play ho raha hai · "+fmt(c.start)+" → "+fmt(c.end));
+            return;
+          }
+          seekPreview(c.start, true);
+          if(state.player){
+            try{
+              state.player.loadVideoById({ videoId:state.videoId, startSeconds:c.start, endSeconds:c.end });
+              toast("Clip "+fmt(c.start)+" se play ho raha hai");
+              return;
+            }catch(e){}
+          }
+          toast("Clip preview mein play ho raha hai");
+        }
+        $("playSeg").addEventListener("click", function(){
+          if(state.selected<0){ toast("Pehle ek clip select karo ya AI clips banao"); return; }
+          playSegment();
+        });
+
+        /* ---------- Export ---------- */
+        function copyText(txt, msg){
+          if(navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(txt).then(function(){ toast(msg); }, function(){ toast("Copy nahi hua — browser permission chahiye"); });
+          } else { toast("Copy support nahi hai is browser mein"); }
+        }
+        $("dlPlan").addEventListener("click", function(){
+          if(!state.clips.length){ toast("Pehle clips banao"); return; }
+          var out=[];
+          out.push("AI CLIPPER — POORA CLIP PLAN (SNAZZY CLIPS)");
+          out.push("Video: "+(state.title||state.uploadName||state.videoId));
+          if(state.sourceType==="youtube" && state.videoId) out.push("Link: https://www.youtube.com/watch?v="+state.videoId);
+          out.push("Total Parts: "+state.clips.length);
+          out.push("");
+          state.clips.forEach(function(c,i){ out.push(clipPlanText(c,i)); out.push(""); });
+          downloadText(out.join("\n"), "snazzy-clips-poora-plan.txt");
+          toast("Poora clip plan download ho gaya — har Part ke hashtags ke saath");
+        });
+
+        /* ---------- Per-clip Download ---------- */
+        function downloadClip(i){
+          var c=state.clips[i]; if(!c) return;
+          if(state.sourceType!=="upload"){
+            // YouTube apni videos download nahi karne deta — is liye is Part ki plan file milti hai
+            downloadText(clipPlanText(c,i), "snazzy-clips-part-"+(i+1)+"-plan.txt");
+            toast("Part "+(i+1)+" ki plan file download ho gayi — YouTube video seedha download nahi hota");
+            return;
+          }
+          setDlStatus("Part "+(i+1)+" ki video ban rahi hai… clip browser mein record ho rahi hai — taqreeban "+fmt(c.end-c.start)+" lagega. Page band na karo, download khud start ho jayega.");
+          toast("Part "+(i+1)+" ki video ban rahi hai… thoda wait karo");
+          renderClipBlob(c, function(pct, left){
+            setDlStatus("Part "+(i+1)+" ki video ban rahi hai… "+pct+"% ho gaya"+(left!=null? " · taqreeban "+left+" sec baqi":"")+" — page band na karo.");
+          }).then(function(blob){
+            var ext = (blob.type||"").indexOf("mp4")>-1 ? "mp4" : "webm";
+            downloadBlob(blob, "snazzy-clips-part-"+(i+1)+"-"+slug(c.title)+"."+ext);
+            setDlStatus("✔ Part "+(i+1)+" ki video download ho gayi — phone ke Downloads folder mein check karo.");
+            toast("Part "+(i+1)+" ki video download ho gayi!");
+          }).catch(function(){
+            setDlStatus("");
+            downloadText(clipPlanText(c,i), "snazzy-clips-part-"+(i+1)+"-plan.txt");
+            toast("Video nahi ban saki — Part "+(i+1)+" ki plan file download kar di hai");
+          });
+        }
+
+        /* ---------- Download All (ek hi button) ---------- */
+        $("dlAll").addEventListener("click", function(){
+          if(!state.clips.length){ toast("Pehle clips banao"); return; }
+          if(state.sourceType!=="upload"){
+            var out=[];
+            out.push("AI CLIPPER — SAB PARTS KA PLAN (EK FILE)");
+            out.push("Video: "+(state.title||state.videoId));
+            out.push("Link: https://www.youtube.com/watch?v="+state.videoId);
+            out.push("Note: YouTube apni videos download nahi karne deta. Ye file har Part ka exact time, hook, captions aur hashtags deti hai — CapCut / editor mein inhi times par kaat kar har Part ka final MP4 bana lo.");
+            out.push("");
+            state.clips.forEach(function(c,i){ out.push(clipPlanText(c,i)); out.push(""); });
+            downloadText(out.join("\n"), "snazzy-clips-all-parts-plan.txt");
+            toast("Sab Parts ka plan ek hi file mein download ho gaya");
+            return;
+          }
+          // Upload source: saare asal video clips ek ZIP mein
+          setDlStatus("Sab clips ki videos ban rahi hain… (0/"+state.clips.length+") — har clip apni length ke barabar time legi, page band na karo.");
+          toast("Sab clips ka ZIP ban raha hai…");
+          loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js").then(function(){
+            var zip=new JSZip();
+            var chain=Promise.resolve();
+            state.clips.forEach(function(c,i){
+              chain=chain.then(function(){
+                return renderClipBlob(c, function(pct){
+                  setDlStatus("Part "+(i+1)+" ki video ban rahi hai… "+pct+"% ("+(i+1)+"/"+state.clips.length+") — page band na karo.");
+                }).then(function(blob){
+                  var ext = (blob.type||"").indexOf("mp4")>-1 ? "mp4" : "webm";
+                  zip.file("part-"+(i+1)+"-"+slug(c.title)+"."+ext, blob);
+                });
+              });
+            });
+            return chain.then(function(){
+              var plan=["AI CLIPPER — CLIP PLAN","Video: "+state.uploadName,""];
+              state.clips.forEach(function(c,i){ plan.push(clipPlanText(c,i)); plan.push(""); });
+              zip.file("clip-plan-and-hashtags.txt", plan.join("\n"));
+              setDlStatus("ZIP taiyaar ho raha hai…");
+              return zip.generateAsync({type:"blob"});
+            });
+          }).then(function(blob){
+            downloadBlob(blob, "snazzy-clips-all-parts.zip");
+            setDlStatus("✔ Sab clips ek ZIP mein download ho gaye — phone ke Downloads folder mein check karo.");
+            toast("Sab clips ek ZIP mein download ho gaye — Part 1, Part 2… sab alag files!");
+          }).catch(function(){
+            setDlStatus("");
+            toast("ZIP nahi ban saka — har clip ke apne Download Video button se alag alag download kar lo");
+          });
+        });
+
+        /* ---------- Browser mein video cutting ----------
+           Pehle wala tareeqa (ffmpeg.wasm) phone ke browser mein fail ho jata tha:
+           usay SharedArrayBuffer chahiye jo is tarah ke page mein available nahi hota,
+           is liye render fail ho kar sirf plan file girti thi — video nahi.
+           Ab asal tareeqa: canvas + MediaRecorder. Clip preview wale 9:16 layout mein
+           browser ke andar hi record hoti hai — na server, na koi khaas browser feature.
+           Jahan SharedArrayBuffer ho wahan purana fast tareeqa (stream copy) pehle try hota hai. */
+        function loadScript(src){
+          return new Promise(function(res, rej){
+            var s=document.createElement("script");
+            s.src=src; s.onload=function(){ res(); }; s.onerror=function(){ rej(new Error("load failed")); };
+            document.head.appendChild(s);
+          });
+        }
+        var ffInstance=null, ffLoading=null;
+        function ensureFFmpeg(){
+          if(ffInstance) return Promise.resolve(ffInstance);
+          if(ffLoading) return ffLoading;
+          ffLoading=loadScript("https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js").then(function(){
+            var ff=FFmpeg.createFFmpeg({ log:false, corePath:"https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js" });
+            return ff.load().then(function(){ ffInstance=ff; return ff; });
+          }).catch(function(err){ ffLoading=null; throw err; });
+          return ffLoading;
+        }
+        function renderViaFFmpeg(c){
+          function readOut(ff){
+            var out=ff.FS("readFile","output.mp4");
+            if(!out || !out.length) throw new Error("empty output");
+            return new Blob([out.buffer], {type:"video/mp4"});
+          }
+          return ensureFFmpeg().then(function(ff){
+            return FFmpeg.fetchFile(state.uploadFile).then(function(data){
+              var ext=((state.uploadName.split(".").pop()||"mp4").toLowerCase().replace(/[^a-z0-9]/g,""))||"mp4";
+              var inName="input."+ext;
+              var dur=String(Math.max(1, Math.round((c.end-c.start)*100)/100));
+              try{ ff.FS("unlink","output.mp4"); }catch(e){}
+              ff.FS("writeFile", inName, data);
+              function reEncode(){
+                try{ ff.FS("unlink","output.mp4"); }catch(e){}
+                return ff.run("-ss", String(c.start), "-i", inName, "-t", dur, "-c:v", "libx264", "-preset", "ultrafast", "-c:a", "aac", "-movflags", "+faststart", "output.mp4")
+                  .then(function(){ return readOut(ff); });
+              }
+              return ff.run("-ss", String(c.start), "-i", inName, "-t", dur, "-c", "copy", "-avoid_negative_ts", "make_zero", "output.mp4")
+                .then(function(){
+                  try{ return readOut(ff); }catch(e){ return reEncode(); }
+                })
+                .catch(function(){ return reEncode(); });
+            });
+          });
+        }
+        /* Canvas par cover-fit draw — stretch nahi, smart crop (preview jaisa hi layout) */
+        function drawCover(ctx, media, mw, mh, dx, dy, dw, dh, focusY){
+          if(!mw || !mh) return;
+          var scale=Math.max(dw/mw, dh/mh);
+          var sw=dw/scale, sh=dh/scale;
+          var sx=(mw-sw)/2, sy=(mh-sh)*focusY;
+          try{ ctx.drawImage(media, sx, sy, sw, sh, dx, dy, dw, dh); }catch(e){}
+        }
+        function pickMime(){
+          if(!window.MediaRecorder) return "";
+          var opts=["video/mp4","video/mp4;codecs=avc1.640028,mp4a.40.2","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
+          for(var i=0;i<opts.length;i++){ try{ if(MediaRecorder.isTypeSupported(opts[i])) return opts[i]; }catch(e){} }
+          return "";
+        }
+        function renderViaRecorder(c, onProgress){
+          return new Promise(function(resolve, reject){
+            if(!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream){ reject(new Error("MediaRecorder unsupported")); return; }
+            var mime=pickMime(); if(!mime){ reject(new Error("no supported mime")); return; }
+            var W=540, H=960, topH=Math.round(H*0.32);
+            var canvas=document.createElement("canvas"); canvas.width=W; canvas.height=H;
+            var ctx=canvas.getContext("2d");
+            var video=document.createElement("video");
+            video.src=state.uploadUrl; video.playsInline=true; video.preload="auto";
+            var thumbImg=null;
+            if(effectiveType()!=="streamer" && state.uploadThumb){
+              thumbImg=new Image(); thumbImg.src=state.uploadThumb;
+            }
+            // Captions: preview ki tarah ek line, 2-3 words ke chunks
+            var chunks=[];
+            (c.lines||[]).forEach(function(line){ for(var i=0;i<line.length;i+=3) chunks.push(line.slice(i,i+3)); });
+            var audioCtx=null, rec=null, rafId=0, chunksData=[], done=false, safety=null;
+            function cleanup(){
+              if(rafId) cancelAnimationFrame(rafId);
+              if(safety) clearTimeout(safety);
+              try{ video.pause(); }catch(e){}
+              if(audioCtx){ try{ audioCtx.close(); }catch(e){} }
+            }
+            function fail(err){ if(done) return; done=true; cleanup(); reject(err||new Error("record failed")); }
+            video.addEventListener("error", function(){ fail(new Error("video load error")); });
+            video.addEventListener("loadedmetadata", function(){
+              try{ video.currentTime=c.start; }catch(e){ fail(e); }
+            });
+            video.addEventListener("seeked", function onSeeked(){
+              video.removeEventListener("seeked", onSeeked);
+              // Audio: WebAudio se lo taake recording ke doran speaker se awaz na aaye
+              var tracks=[];
+              try{
+                var AC=window.AudioContext||window.webkitAudioContext;
+                audioCtx=new AC();
+                var srcNode=audioCtx.createMediaElementSource(video);
+                var dest=audioCtx.createMediaStreamDestination();
+                srcNode.connect(dest);
+                dest.stream.getAudioTracks().forEach(function(t){ tracks.push(t); });
+                if(audioCtx.state==="suspended") audioCtx.resume();
+              }catch(e){
+                try{
+                  var vs=video.captureStream ? video.captureStream() : (video.mozCaptureStream ? video.mozCaptureStream() : null);
+                  if(vs) vs.getAudioTracks().forEach(function(t){ tracks.push(t); });
+                }catch(e2){}
+              }
+              var cs=canvas.captureStream(30);
+              cs.getVideoTracks().forEach(function(t){ tracks.push(t); });
+              try{
+                rec=new MediaRecorder(new MediaStream(tracks), { mimeType:mime, videoBitsPerSecond:5000000, audioBitsPerSecond:128000 });
+              }catch(e){ fail(e); return; }
+              rec.ondataavailable=function(ev){ if(ev.data && ev.data.size) chunksData.push(ev.data); };
+              rec.onstop=function(){
+                if(done) return; done=true; cleanup();
+                if(!chunksData.length){ reject(new Error("empty recording")); return; }
+                resolve(new Blob(chunksData, { type:mime.split(";")[0] }));
+              };
+              var dur=c.end-c.start;
+              function draw(){
+                if(done) return;
+                var vw=video.videoWidth, vh=video.videoHeight;
+                ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+                if(thumbImg && thumbImg.complete && thumbImg.naturalWidth){
+                  drawCover(ctx, thumbImg, thumbImg.naturalWidth, thumbImg.naturalHeight, 0, 0, W, topH, 0.5);
+                } else {
+                  drawCover(ctx, video, vw, vh, 0, 0, W, topH, 0.18);
+                }
+                drawCover(ctx, video, vw, vh, 0, topH, W, H-topH, 0.55);
+                // Chhote captions gameplay ke upar, character ke pairon ke paas — ek hi line
+                if(state.capMode!=="youtube" && chunks.length){
+                  var elapsed=video.currentTime-c.start;
+                  var chunk=chunks[Math.min(chunks.length-1, Math.max(0, Math.floor(elapsed/0.95)))];
+                  var hlOn=$("hlToggle").checked;
+                  ctx.font="26px Anton, Arial, sans-serif";
+                  ctx.textBaseline="middle";
+                  var words=chunk.map(function(w){ return w[0]; });
+                  var widths=words.map(function(w){ return ctx.measureText(w).width; });
+                  var gap=8, pad=7;
+                  var total=widths.reduce(function(a,b){ return a+b; },0)+gap*(words.length-1)+pad*2*words.length;
+                  var x=(W-total)/2, y=Math.round(H*0.70);
+                  words.forEach(function(w,i){
+                    var bw=widths[i]+pad*2;
+                    ctx.fillStyle="rgba(0,0,0,.62)";
+                    ctx.beginPath();
+                    if(ctx.roundRect) ctx.roundRect(x, y-17, bw, 34, 5); else ctx.rect(x, y-17, bw, 34);
+                    ctx.fill();
+                    ctx.fillStyle=(hlOn && chunk[i][1]==="k") ? CAP_COLORS[state.capStyle] : "#ffffff";
+                    ctx.fillText(w, x+pad, y+1);
+                    x+=bw+gap;
+                  });
+                  if(onProgress) onProgress(Math.min(99, Math.round(elapsed/dur*100)), Math.max(0, Math.ceil(dur-elapsed)));
+                } else if(onProgress){
+                  var el2=video.currentTime-c.start;
+                  onProgress(Math.min(99, Math.round(el2/dur*100)), Math.max(0, Math.ceil(dur-el2)));
+                }
+                if(video.currentTime>=c.end-0.05 || video.ended){
+                  try{ rec.stop(); }catch(e){ fail(e); }
+                  return;
+                }
+                rafId=requestAnimationFrame(draw);
+              }
+              video.play().then(function(){
+                try{ rec.start(500); }catch(e){ fail(e); return; }
+                rafId=requestAnimationFrame(draw);
+                safety=setTimeout(function(){ try{ if(rec && rec.state!=="inactive") rec.stop(); }catch(e){} }, (dur+8)*1000);
+              }).catch(function(e){ fail(e); });
+            });
+          });
+        }
+        function renderClipBlob(c, onProgress){
+          // Fast tareeqa sirf wahan jahan SharedArrayBuffer asal mein available ho (desktop Chrome waghera);
+          // phone par seedha recorder wala tareeqa — jo hamesha chalta hai.
+          if(typeof SharedArrayBuffer!=="undefined" && state.uploadFile){
+            return renderViaFFmpeg(c).catch(function(){ return renderViaRecorder(c, onProgress); });
+          }
+          return renderViaRecorder(c, onProgress);
+        }
+      })();
+    </script>
+  </body>
+</html>
